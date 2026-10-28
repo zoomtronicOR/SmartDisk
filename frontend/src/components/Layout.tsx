@@ -6,6 +6,7 @@ import { api } from "../api";
 import { useAuth } from "../auth";
 import { ROLE_LABELS, setDisplayTimezone } from "../format";
 import type { AlarmSummary, SystemStatus } from "../types";
+import { useBranding } from "./BrandingCard";
 import Clock from "./Clock";
 import { Alert, Spinner } from "./ui";
 
@@ -40,6 +41,7 @@ export default function Layout() {
     refetchInterval: 30_000,
   });
 
+  const branding = useBranding();
   const alarms = useQuery({
     queryKey: ["alarm-summary"],
     queryFn: () => api<AlarmSummary>("/alarms/summary", { background: true }),
@@ -79,7 +81,7 @@ export default function Layout() {
           <HardDrive className="size-6 text-brand-600" />
           <span className="text-lg font-semibold">SmartDisk</span>
         </div>
-        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 pb-10">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 pb-3">
           {nav.map(({ to, label, icon: Icon, end, badge }: { to: string; label: string; icon: typeof Server; end?: boolean; badge?: boolean }) => (
             <NavLink
               key={to}
@@ -105,9 +107,20 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-        {system.data && (
-          <p className="absolute bottom-3 left-5 text-xs text-slate-400">Verzija {system.data.version}</p>
-        )}
+        {/* Dno menija: verzija, ispod nje logo kompanije (Podešavanja → Izgled) */}
+        <div className="shrink-0 space-y-2 border-t border-slate-200 px-5 py-3 dark:border-slate-800">
+          {system.data && <p className="text-xs text-slate-400">Verzija {system.data.version}</p>}
+          {branding.data?.has_logo ? (
+            <img
+              src={`/api/branding/logo?v=${branding.data.version}`}
+              alt={branding.data.company_name || "Logo kompanije"}
+              title={branding.data.company_name || undefined}
+              className="max-h-16 w-full object-contain object-left"
+            />
+          ) : branding.data?.company_name ? (
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{branding.data.company_name}</p>
+          ) : null}
+        </div>
       </aside>
       {menuOpen && <div className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden" onClick={() => setMenuOpen(false)} />}
 

@@ -131,6 +131,7 @@ Posle svakog planiranog ili ručnog ciklusa `collector._evaluate` poziva `health
 - **Režim održavanja (§16.4)**: do zadatog vremena šalju se samo kritična obaveštenja. Preskakanje se beleži u evidenciji, a MQTT telemetrija radi i dalje.
 - **Zakazani izveštaji**: `schedules.py`, dnevno, nedeljno ili mesečno, PDF/XLSX/CSV u prilogu e-pošte. Proverava se svakog sata (`:05`), uz zaštitu od dvostrukog slanja.
 - **Backup (§16.5)**: `backup.py`, sa `pg_dump -Fc`, proverom (`pg_restore --list`), rotacijom i dnevnim poslom. Neuspeh daje alarm `backup_failed`. Vraćanje je opisano u instalacija.md.
+- **Logo kompanije**: `routers/branding.py` čuva sliku u `app_settings` (pa ulazi u backup). Prihvata samo PNG, JPEG i WebP do 512 KB (provera po potpisu fajla, SVG se odbija jer može da sadrži skripte). Slika se servira sa `Content-Security-Policy: default-src 'none'`.
 - **API tokeni (§16.7)**: `Authorization: Bearer sdk_…`. Uloga tokena je najviše operater (`read` = samo GET); token se prikazuje jednom; ima rok i opoziv; upravljanje tokenima je moguće samo prijavljenom korisniku (`session_user`), ne tokenom.
 
 ### Profili privilegija (spec. §5.3)

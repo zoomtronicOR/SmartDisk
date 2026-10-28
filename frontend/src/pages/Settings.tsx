@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import IntervalInput from "../components/IntervalInput";
 import AdvancedSettingsSection from "../components/AdvancedSettings";
+import BrandingCard from "../components/BrandingCard";
 import NotificationSettingsSection from "../components/NotificationSettings";
 import { Alert, Button, Card, ErrorText, Field, Input, Select, Spinner } from "../components/ui";
 import { formatBytes, formatDateTime } from "../format";
@@ -94,6 +95,8 @@ export default function SettingsPage() {
           </Button>
         </div>
       </Card>
+
+      <BrandingCard />
 
       <NotificationSettingsSection />
 

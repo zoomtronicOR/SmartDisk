@@ -56,7 +56,7 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 export function Field({ label, hint, children }: { label: string; hint?: ReactNode; children: ReactNode }) {
   return (
     <label className="block space-y-1">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</span>
+      <span className="block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</span>
       {children}
       {hint && <span className="block text-xs text-slate-500 dark:text-slate-400">{hint}</span>}
     </label>

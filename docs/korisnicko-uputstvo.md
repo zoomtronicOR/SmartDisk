@@ -40,7 +40,7 @@ Otvorite adresu aplikacije u pregledaču i unesite korisničko ime i lozinku. Ak
 
 - **Meni levo** vodi na sve delove aplikacije i stoji u mestu dok se sadržaj pomera. Pored stavke **Alarmi** stoji broj aktivnih alarma: crven kada ima visokih ili kritičnih, narandžast za upozorenja. Na telefonu se meni otvara dugmetom ☰ gore levo.
 - **Zaglavlje** prikazuje datum i vreme servera, vaše ime i ulogu, prekidač svetle/tamne teme (☀/☾) i dugme **Odjava**. Ako je vreme servera netačno, pored sata piše „(NTP!)”.
-- U donjem levom uglu je verzija aplikacije.
+- Na dnu menija je verzija aplikacije, a ispod nje logo vaše kompanije (ako ga je administrator postavio).
 
 ![Pregled](uputstvo-slike/01-pregled.jpg)
 
@@ -301,6 +301,7 @@ Brisanje uređaja ne briše istoriju njegovih diskova.
 |---|---|
 | **Prikupljanje podataka** | koliko često se čitaju uređaji (globalni interval) i koliko dugo se čuvaju detaljna merenja (podrazumevano 365 dana; dnevni proseci ostaju i posle toga) |
 | **Opšte** | vremenska zona prikaza |
+| **Izgled – logo kompanije** | logo na dnu menija (PNG, JPEG ili WebP do 512 KB; širok logo sa providnom pozadinom izgleda najbolje) i naziv kompanije. **Ukloni logo** ga briše |
 | **Pragovi alarma** | temperature po tipu diska, dozvoljen broj novih grešaka, granice za SSD/NVMe i zauzeće, koliko neuspelih očitavanja znači „nedostupan”, ponovno obaveštavanje. **Vrati preporučene** vraća podrazumevane vrednosti |
 | **E-pošta (SMTP)**, **MQTT i Home Assistant**, **Dodatni kanali** | kanali obaveštenja, svaki sa probom |
 | **Opšte za obaveštenja** | adresa aplikacije za linkove u porukama, obaveštenje kada se alarm reši |

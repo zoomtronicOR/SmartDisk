@@ -55,3 +55,13 @@ def test_channel_validation_without_network():
         channels._send_sync("telegram", channels.DEFAULTS["telegram"], "t", "b", None, "info", None)
     with pytest.raises(channels.ChannelError):
         channels._send_sync("webhook", {"url": "ftp://x"}, "t", "b", None, "info", None)
+
+
+def test_logo_format_detection():
+    from app.routers.branding import _detect
+
+    assert _detect(b"\x89PNG\r\n\x1a\n....") == "image/png"
+    assert _detect(b"\xff\xd8\xff\xe0....") == "image/jpeg"
+    assert _detect(b"RIFF\x00\x00\x00\x00WEBPVP8 ") == "image/webp"
+    assert _detect(b"<svg xmlns='http://www.w3.org/2000/svg'><script>alert(1)</script></svg>") is None
+    assert _detect(b"GIF89a") is None
