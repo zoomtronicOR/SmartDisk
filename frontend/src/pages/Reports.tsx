@@ -11,6 +11,7 @@ const DESCRIPTIONS: Record<string, string> = {
   devices: "Stanje svih uređaja, broj diskova i upozorenja, dostupnost u periodu.",
   disks: "Svi diskovi sa poslednjim SMART vrednostima (inventar).",
   disk_warnings: "Diskovi sa upozorenjem, kritičnim stanjem ili bez podataka, sa razlozima.",
+  degradation: "Diskovi čije je zdravlje Pažnja, Ugroženo ili Kritično, sa razlozima i promenama u periodu.",
   smart_changes: "Brojači grešaka čija se vrednost promenila u periodu (realocirani, pending, CRC, NVMe…).",
   pool_errors: "ZFS pool-ovi, RAID nizovi i LVM: stanje, greške u periodu, scrub.",
   availability: "Periodi kada uređaj nije bio dostupan, sa trajanjem i razlogom.",
@@ -36,7 +37,7 @@ export default function ReportsPage() {
     queryFn: () => api<ReportData>(`/reports/${kind}?${params}`),
     placeholderData: (prev) => prev,
   });
-  const usesDevice = ["disks", "disk_warnings", "smart_changes", "pool_errors"].includes(kind);
+  const usesDevice = ["disks", "disk_warnings", "degradation", "smart_changes", "pool_errors"].includes(kind);
   const usesPeriod = !["disks", "disk_warnings"].includes(kind);
 
   return (
@@ -112,7 +113,7 @@ export default function ReportsPage() {
               <p key={n} className="text-xs text-slate-500 dark:text-slate-400">{n}</p>
             ))}
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Dnevni, nedeljni i mesečni pregled: period 24 sata, 7 dana ili 30 dana. CSV koristi „;” kao separator i otvara se direktno u Excel-u sa srpskim podešavanjima. Izveštaj o diskovima sa ubrzanom degradacijom dolazi u Fazi 4.
+              Dnevni, nedeljni i mesečni pregled: period 24 sata, 7 dana ili 30 dana. CSV koristi „;” kao separator i otvara se direktno u Excel-u sa srpskim podešavanjima.
             </p>
           </div>
         </Card>

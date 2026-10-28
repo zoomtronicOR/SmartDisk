@@ -16,6 +16,7 @@ import UsersPage from "./pages/Users";
 // Stranice sa grafikonima se učitavaju tek kada zatrebaju (Recharts je veliki paket).
 const AlarmsPage = lazy(() => import("./pages/Alarms"));
 const ComparePage = lazy(() => import("./pages/Compare"));
+const HelpPage = lazy(() => import("./pages/Help"));
 const StorageMapPage = lazy(() => import("./pages/StorageMap"));
 const AlarmDetailPage = lazy(() => import("./pages/AlarmDetail"));
 const DeviceDetailPage = lazy(() => import("./pages/DeviceDetail"));
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="alarmi" element={<AlarmsPage />} />
         <Route path="poredjenje" element={<ComparePage />} />
         <Route path="mapa" element={<StorageMapPage />} />
+        <Route path="pomoc" element={<HelpPage />} />
         <Route path="alarmi/:id" element={<AlarmDetailPage />} />
         {admin && <Route path="korisnici" element={<UsersPage />} />}
         {admin && <Route path="podesavanja" element={<SettingsPage />} />}

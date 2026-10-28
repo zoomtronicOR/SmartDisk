@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { BellRing, ChartLine, Columns3, Database, Network, FileText, HardDrive, LayoutDashboard, LogOut, Menu, Moon, ScrollText, Server, Settings, Sun, UserCircle, Users } from "lucide-react";
+import { BellRing, ChartLine, CircleHelp, Columns3, Database, Network, FileText, HardDrive, LayoutDashboard, LogOut, Menu, Moon, ScrollText, Server, Settings, Sun, UserCircle, Users } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { api } from "../api";
@@ -65,6 +65,7 @@ export default function Layout() {
         ]
       : []),
     { to: "/nalog", label: "Moj nalog", icon: UserCircle },
+    { to: "/pomoc", label: "Pomoć", icon: CircleHelp },
   ];
 
   return (

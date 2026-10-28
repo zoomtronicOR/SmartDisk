@@ -18,6 +18,7 @@ REPORT_KINDS: dict[str, str] = {
     "disks": "Inventar diskova",
     "disk_warnings": "Diskovi sa upozorenjima",
     "smart_changes": "SMART promene u periodu",
+    "degradation": "Diskovi sa degradacijom",
     "pool_errors": "Stanje skladišta (ZFS/RAID) i greške",
     "availability": "Nedostupnost uređaja",
 }
@@ -72,6 +73,8 @@ async def build(db: AsyncSession, kind: str, start: datetime, end: datetime, dev
         return await _report_disks(db, device_id, only_warnings=False)
     if kind == "disk_warnings":
         return await _report_disks(db, device_id, only_warnings=True)
+    if kind == "degradation":
+        return await _report_degradation(db, start, end, period, device_id)
     if kind == "smart_changes":
         return await _report_smart_changes(db, start, end, period, device_id)
     if kind == "pool_errors":
@@ -248,3 +251,34 @@ async def _report_availability(db: AsyncSession, start: datetime, end: datetime,
         Column("hours", "Trajanje (h)", "float"), Column("failed_runs", "Neuspelih ciklusa", "int"),
         Column("ongoing", "I dalje traje"), Column("reason", "Razlog"),
     ], rows, period, [f"Ukupno – {totals}.", "Nedostupnost traje od prvog neuspelog do prvog sledećeg uspešnog ciklusa."])
+
+
+HEALTH_LABEL = {"excellent": "Odlično", "good": "Dobro", "attention": "Pažnja", "endangered": "Ugroženo",
+                "critical": "Kritično", "unknown": "Nepoznato"}
+
+
+async def _report_degradation(db: AsyncSession, start: datetime, end: datetime, period: str,
+                              device_id: int | None) -> Report:
+    """Diskovi sa nivoom zdravlja Pažnja/Ugroženo/Kritično, sa razlozima i promenama brojača u periodu (spec. §10.7)."""
+    changes = await _report_smart_changes(db, start, end, period, device_id)
+    by_disk: dict[str, list[str]] = {}
+    for row in changes.rows:
+        by_disk.setdefault(row["disk"], []).append(f"{row['attribute']} {row['delta']:+d}")
+    rows = []
+    for disk, device, _sample in await _disk_rows(db, device_id):
+        if disk.health_level not in ("attention", "endangered", "critical"):
+            continue
+        label = f"{disk.device_path} · {disk.model or '?'}"
+        rows.append({
+            "device": device.name, "disk": label, "serial": disk.serial_number,
+            "health": HEALTH_LABEL.get(disk.health_level or "unknown"), "score": disk.health_score,
+            "reasons": " ".join(r.get("text", "") for r in disk.health_reasons or []),
+            "changes": "; ".join(by_disk.get(label, [])) or None,
+        })
+    order = {"Kritično": 0, "Ugroženo": 1, "Pažnja": 2}
+    rows.sort(key=lambda r: (order.get(r["health"], 9), r["device"]))
+    return Report(REPORT_KINDS["degradation"], [
+        Column("device", "Uređaj"), Column("disk", "Disk"), Column("serial", "Serijski broj"),
+        Column("health", "Zdravlje"), Column("score", "Ocena", "int"), Column("changes", "Promene brojača u periodu"),
+        Column("reasons", "Razlozi"),
+    ], rows, period, ["Obuhvata diskove čije je zdravlje Pažnja, Ugroženo ili Kritično (procena iz istorije, ne samo SMART status)."])

@@ -57,3 +57,22 @@ code,
   --chart-axis: #94a3b8;
   --chart-surface: #0f172a;
 }
+
+/* Korisničko uputstvo (stranica Pomoć) – čitljiva tipografija bez dodatnih paketa */
+.help-doc { line-height: 1.65; font-size: 0.95rem; }
+.help-doc h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 1rem; }
+.help-doc h2 { font-size: 1.35rem; font-weight: 650; margin: 2rem 0 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--chart-grid); scroll-margin-top: 4rem; }
+.help-doc h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; scroll-margin-top: 4rem; }
+.help-doc p, .help-doc ul, .help-doc ol, .help-doc blockquote, .help-doc table, .help-doc pre { margin: 0.6rem 0; }
+.help-doc ul { list-style: disc; padding-left: 1.5rem; }
+.help-doc ol { list-style: decimal; padding-left: 1.5rem; }
+.help-doc li { margin: 0.2rem 0; }
+.help-doc a { color: var(--color-brand-700); text-decoration: underline; text-underline-offset: 2px; }
+.dark .help-doc a { color: var(--color-brand-500); }
+.help-doc code { font-size: 0.85em; padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--chart-grid); }
+.help-doc blockquote { border-left: 3px solid var(--color-brand-600); padding: 0.4rem 0.9rem; background: color-mix(in srgb, var(--color-brand-600) 8%, transparent); border-radius: 0 0.4rem 0.4rem 0; }
+.help-doc table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.help-doc th, .help-doc td { border-bottom: 1px solid var(--chart-grid); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+.help-doc th { font-weight: 600; }
+.help-doc img { max-width: 100%; border-radius: 0.5rem; border: 1px solid var(--chart-grid); margin: 0.75rem 0; }
+.help-doc hr { margin: 1.5rem 0; border-color: var(--chart-grid); }

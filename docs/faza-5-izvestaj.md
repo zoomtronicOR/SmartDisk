@@ -1,7 +1,7 @@
 # Izveštaj – Faza 5: Napredne funkcije
 
 **Datum:** 28.10.2026.
-**Verzija:** 0.5.0 + migracija `0005`
+**Verzija:** 0.5.0 + migracija `0005` (korisničko uputstvo: 0.6.0)
 **Okruženje:** LXC `Smart-Disk`, `https://192.168.88.246`
 
 ## Isporučeno (spec. §22, Faza 5, i dodatni zahtevi)

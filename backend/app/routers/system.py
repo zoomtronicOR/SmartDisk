@@ -18,12 +18,12 @@ from ..health import HEALTH_LEVELS, SEVERITIES
 from ..models import AuditLog, CollectionRun, Device, Disk, DiskSample, Event, StoragePool, User
 from ..schemas import AuditOut, AuditPage, CollectionSettings, CollectionSettingsIn, GeneralSettings, RunOut
 from .devices import device_status
+from ..notify import config as notify_config
 from .storage import disk_findings, last_smart_samples, standby_ids
 
 router = APIRouter(prefix="/api", tags=["system"])
 
-# Privremeni prag za „povišenu temperaturu” na pregledu; podesivi pragovi po tipu diska dolaze u Fazi 4.
-HOT_TEMPERATURE_C = 50
+
 
 
 @router.get("/health")
@@ -112,6 +112,7 @@ async def dashboard_summary(_: User = Depends(current_user), db: AsyncSession = 
     )).all()
     temps = []
     last = await last_smart_samples(db, standby_ids(list(disk_rows)))
+    th = await notify_config.thresholds(db)
     smart_failed = hot = 0
     for disk, sample in disk_rows:
         state, reasons = disk_findings(sample, disk.is_present, last.get(disk.id))
@@ -120,7 +121,8 @@ async def dashboard_summary(_: User = Depends(current_user), db: AsyncSession = 
         if effective is not None and disk.is_present:
             if effective.temperature_c is not None:
                 temps.append(effective.temperature_c)
-                hot += effective.temperature_c >= HOT_TEMPERATURE_C
+                kind = "nvme" if disk.disk_type == "nvme" else "ssd" if disk.disk_type == "ssd" else "hdd"
+                hot += effective.temperature_c >= th["temperature"][kind]["warning"]
             smart_failed += effective.smart_health == "failed"
         if state in ("critical", "warning") or not disk.is_present:
             attention.append({"kind": "disk", "id": disk.id, "device_name": names.get(disk.device_id),
@@ -157,7 +159,7 @@ async def dashboard_summary(_: User = Depends(current_user), db: AsyncSession = 
         "max_temperature_c": max(temps, default=None),
         "smart_failed_disks": smart_failed,
         "hot_disks": hot,
-        "hot_threshold_c": HOT_TEMPERATURE_C,
+        "hot_threshold_c": th["temperature"]["hdd"]["warning"],
         "attention": sorted(attention, key=lambda a: a["state"] != "critical"),
         "devices_total": len(devices),
         "devices_by_status": counts,

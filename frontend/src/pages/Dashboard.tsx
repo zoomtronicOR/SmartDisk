@@ -30,7 +30,7 @@ export default function DashboardPage() {
           label="Zdravlje diskova"
           value={`${hd.excellent + hd.good} / ${data.disks_total}`}
           tone={hd.critical || hd.endangered ? "critical" : hd.attention ? "warning" : undefined}
-          sub={`dobro · ${hd.attention} pažnja · ${hd.endangered} ugroženo · ${hd.critical} kritično · ${hd.unknown} nepoznato`}
+          sub={`${hd.excellent + hd.good} dobro · ${hd.attention} pažnja · ${hd.endangered} ugroženo · ${hd.critical} kritično · ${hd.unknown} nepoznato`}
         />
         <Stat
           label="Aktivni alarmi"
@@ -48,7 +48,7 @@ export default function DashboardPage() {
           label="Temperatura"
           value={data.max_temperature_c != null ? `${data.max_temperature_c} °C` : "—"}
           tone={data.hot_disks ? "warning" : undefined}
-          sub={`najviša · ${data.hot_disks} disk(a) ≥ ${data.hot_threshold_c} °C · SMART FAILED: ${data.smart_failed_disks}`}
+          sub={`najviša · ${data.hot_disks} disk(a) iznad praga za svoj tip · SMART FAILED: ${data.smart_failed_disks}`}
         />
         <Stat label="Poslednje prikupljanje" value={<span className="text-base">{formatRelative(data.last_collection_at)}</span>} sub={`sledeće: ${formatRelative(data.next_collection_at)} (${formatDateTime(data.next_collection_at)})`} />
       </div>
