@@ -1,0 +1,28 @@
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5236",
+    "platform_info": "FreeBSD 13.1-RELEASE-p9 amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-j",
+      "-a",
+      "/dev/ses0"
+    ],
+    "exit_status": 2
+  },
+  "device": {
+    "name": "/dev/ses0",
+    "info_name": "/dev/ses0",
+    "type": "atacam",
+    "protocol": "ATA"
+  }
+}

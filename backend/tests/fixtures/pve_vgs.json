@@ -1,0 +1,17 @@
+{
+  "report": [
+    {
+      "vg": [
+        {
+          "vg_name": "pve",
+          "vg_size": "999125155840",
+          "vg_free": "17179869184",
+          "pv_count": "1",
+          "lv_count": "13",
+          "vg_attr": "wz--n-"
+        }
+      ]
+    }
+  ],
+  "log": []
+}

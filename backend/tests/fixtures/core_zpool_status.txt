@@ -1,0 +1,55 @@
+  pool: DataPool
+ state: ONLINE
+status: Some supported and requested features are not enabled on the pool.
+	The pool can still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(7) for details.
+  scan: scrub repaired 0B in 00:20:34 with 0 errors on Sun Oct  4 00:20:38 2026
+config:
+
+	NAME                                            STATE     READ WRITE CKSUM
+	DataPool                                        ONLINE       0     0     0
+	  raidz2-0                                      ONLINE       0     0     0
+	    gptid/67e1382f-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+	    gptid/67d05436-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+	    gptid/67eaf4de-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+	    gptid/67dd28d0-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+	    gptid/67fe61ad-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+	    gptid/67f4cba6-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+	    gptid/68abad23-a0b4-11ec-a5c2-a8a159107c30  ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: MediaPool
+ state: ONLINE
+status: Some supported and requested features are not enabled on the pool.
+	The pool can still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(7) for details.
+  scan: scrub repaired 0B in 11:31:43 with 0 errors on Sun Oct  4 11:31:44 2026
+config:
+
+	NAME                                          STATE     READ WRITE CKSUM
+	MediaPool                                     ONLINE       0     0     0
+	  gptid/4d2ff2f3-8c23-11ec-a227-a8a159107c30  ONLINE       0     0     0
+	  gptid/6f8406e2-03bd-11ed-bacd-a8a159107c30  ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: boot-pool
+ state: ONLINE
+status: Some supported and requested features are not enabled on the pool.
+	The pool can still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(7) for details.
+  scan: scrub repaired 0B in 00:00:33 with 0 errors on Wed Oct 28 03:45:33 2026
+config:
+
+	NAME        STATE     READ WRITE CKSUM
+	boot-pool   ONLINE       0     0     0
+	  nvd0p2    ONLINE       0     0     0
+
+errors: No known data errors

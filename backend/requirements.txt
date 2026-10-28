@@ -1,0 +1,15 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.34,<1
+sqlalchemy[asyncio]>=2.0.36,<2.1
+asyncpg>=0.30,<1
+alembic>=1.14,<2
+pydantic>=2.10,<3
+pydantic-settings>=2.7,<3
+argon2-cffi>=23.1
+asyncssh>=2.19,<3
+apscheduler>=3.11,<4
+cryptography>=44
+openpyxl>=3.1,<4
+reportlab>=4.2,<6
+aiomqtt>=2.3,<3
+pywebpush>=2,<3

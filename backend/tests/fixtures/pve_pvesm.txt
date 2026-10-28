@@ -1,0 +1,6 @@
+Name                Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
+HardDrive1TB         dir     active       960302804       262191556       649256788   27.30%
+local                dir     active        98497780        19182080        74266152   19.47%
+local-lvm        lvmthin     active       832888832        98114304       734774527   11.78%
+pbs-backup           pbs     active      9488256000       107261312      9380994688    1.13%
+pbs-backup2          pbs     active      9488256000       107261312      9380994688    1.13%

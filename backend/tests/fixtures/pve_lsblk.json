@@ -1,0 +1,69 @@
+{
+  "blockdevices": [
+    {
+      "name": "loop0",
+      "path": "/dev/loop0",
+      "type": "loop",
+      "tran": null,
+      "rota": true,
+      "size": 42949672960,
+      "model": null,
+      "serial": null,
+      "wwn": null,
+      "rev": null,
+      "vendor": null
+    },
+    {
+      "name": "loop1",
+      "path": "/dev/loop1",
+      "type": "loop",
+      "tran": null,
+      "rota": true,
+      "size": 8589934592,
+      "model": null,
+      "serial": null,
+      "wwn": null,
+      "rev": null,
+      "vendor": null
+    },
+    {
+      "name": "loop8",
+      "path": "/dev/loop8",
+      "type": "loop",
+      "tran": null,
+      "rota": true,
+      "size": 8589934592,
+      "model": null,
+      "serial": null,
+      "wwn": null,
+      "rev": null,
+      "vendor": null
+    },
+    {
+      "name": "sda",
+      "path": "/dev/sda",
+      "type": "disk",
+      "tran": "sata",
+      "rota": true,
+      "size": 1000204886016,
+      "model": "ST1000LM035-1RK172",
+      "serial": "TESTSN0004",
+      "wwn": "0x5000c50123456789",
+      "rev": "SDM3",
+      "vendor": "ATA     "
+    },
+    {
+      "name": "nvme0n1",
+      "path": "/dev/nvme0n1",
+      "type": "disk",
+      "tran": "nvme",
+      "rota": false,
+      "size": 1000204886016,
+      "model": "KINGSTON SNV3S1000G",
+      "serial": "TESTSN0005",
+      "wwn": "eui.00000000000000000026b73123456789",
+      "rev": "P3BR0A23",
+      "vendor": null
+    }
+  ]
+}

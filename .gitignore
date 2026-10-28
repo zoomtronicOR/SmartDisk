@@ -1,0 +1,24 @@
+node_modules/
+frontend/dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.env
+!deploy/smartdisk.env.example
+*.dump
+.vite/
+sertifikat/
+
+# Ne objavljuje se (zahtev vlasnika projekta)
+CLAUDE.md
+Specifikacija_aplikacije_nadzor_diskova_TrueNAS_Proxmox_Synology.md
+
+# SSH ključevi i sertifikati se nikad ne objavljuju
+id_*
+*.pem
+*.key
+*.crt
+*.pub
+*_lxc
+smartdisk_setup*

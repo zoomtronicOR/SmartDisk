@@ -1,0 +1,126 @@
+{
+  "report": [
+    {
+      "lv": [
+        {
+          "lv_name": "data",
+          "vg_name": "pve",
+          "lv_attr": "twi-aotz--",
+          "lv_size": "852878163968",
+          "data_percent": "11.78",
+          "metadata_percent": "0.63",
+          "pool_lv": ""
+        },
+        {
+          "lv_name": "root",
+          "vg_name": "pve",
+          "lv_attr": "-wi-ao----",
+          "lv_size": "103079215104",
+          "data_percent": "",
+          "metadata_percent": "",
+          "pool_lv": ""
+        },
+        {
+          "lv_name": "swap",
+          "vg_name": "pve",
+          "lv_attr": "-wi-ao----",
+          "lv_size": "8589934592",
+          "data_percent": "",
+          "metadata_percent": "",
+          "pool_lv": ""
+        },
+        {
+          "lv_name": "vm-100-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "8589934592",
+          "data_percent": "24.91",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-1002-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "34359738368",
+          "data_percent": "9.19",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-1003-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "21474836480",
+          "data_percent": "17.45",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-101-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "59055800320",
+          "data_percent": "97.39",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-102-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi---tz--",
+          "lv_size": "5368709120",
+          "data_percent": "",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-104-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "2147483648",
+          "data_percent": "93.39",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-105-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "6442450944",
+          "data_percent": "61.08",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-200-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "34359738368",
+          "data_percent": "64.79",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-200-disk-1",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "4194304",
+          "data_percent": "14.06",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        },
+        {
+          "lv_name": "vm-400-disk-0",
+          "vg_name": "pve",
+          "lv_attr": "Vwi-aotz--",
+          "lv_size": "107374182400",
+          "data_percent": "2.34",
+          "metadata_percent": "",
+          "pool_lv": "data"
+        }
+      ]
+    }
+  ],
+  "log": []
+}

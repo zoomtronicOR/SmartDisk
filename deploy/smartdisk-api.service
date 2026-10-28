@@ -1,0 +1,25 @@
+[Unit]
+Description=SmartDisk API i scheduler prikupljanja
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=smartdisk
+Group=smartdisk
+WorkingDirectory=/opt/smartdisk/backend
+EnvironmentFile=/etc/smartdisk/smartdisk.env
+# Jedan worker: scheduler radi u istom procesu i ne sme se duplirati.
+ExecStart=/opt/smartdisk/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1 \
+    --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-server-header --no-access-log
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/lib/smartdisk
+
+[Install]
+WantedBy=multi-user.target
