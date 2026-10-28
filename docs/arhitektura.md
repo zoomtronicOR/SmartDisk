@@ -170,6 +170,7 @@ Posle svakog planiranog ili ručnog ciklusa `collector._evaluate` poziva `health
 | Dodavanje/izmena/brisanje uređaja, SSH i host ključevi | ✓ | | |
 | Korisnici, podešavanja, audit log | ✓ | | |
 
+- Audit prijava (`clientinfo.py`): za `login.success`, `login.failure` (razlog), `login.locked` i `login.rate_limited` u `details` se upisuju rezultat i `device`: IP, ime računara obrnutim DNS-om (najviše 1,5 s), pregledač, OS i uređaj iz User-Agent-a i podaci koje šalje pregledač pri prijavi (ekran, zona, jezik, jezgra, Client Hints sa tačnom verzijom OS-a). Pregledač sme da pošalje samo polja sa unapred određenog spiska, a sve ostalo se odbacuje.
 - Zaštite: ne može se deaktivirati sopstveni nalog niti ukloniti poslednji aktivni administrator. Deaktivacija ili reset lozinke odjavljuje sve sesije korisnika.
 
 ## API

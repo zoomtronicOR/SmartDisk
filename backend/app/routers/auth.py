@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .. import clientinfo
 from ..audit import audit, client_ip
 from ..config import get_settings
 from ..db import get_db
@@ -30,15 +31,25 @@ login_limiter = LoginRateLimiter(_settings.login_rate_per_ip, _settings.login_ra
 async def login(body: LoginIn, request: Request, response: Response, db: AsyncSession = Depends(get_db)) -> User:
     settings = get_settings()
     ip = client_ip(request) or "unknown"
+    username = body.username.strip().lower()
+    device = await clientinfo.collect(request, body.client)
+    device["summary"] = clientinfo.summary(device)
+
+    def details(result: str, reason: str | None = None) -> dict:
+        # Rezultat prijave + sve što se zna o računaru; lozinka se nikad ne upisuje.
+        return {"result": result, "reason": reason, "username": username, "device": device}
+
     if not login_limiter.allow(ip):
+        audit(db, request, None, "login.rate_limited", details=details("odbijeno", "previše pokušaja sa iste adrese"),
+              username=username)
+        await db.commit()
         raise HTTPException(429, "Previše pokušaja prijave. Pokušajte ponovo za nekoliko minuta.")
 
-    username = body.username.strip().lower()
     user = await db.scalar(select(User).where(User.username == username))
     now = utcnow()
 
     if user is not None and user.locked_until is not None and user.locked_until > now:
-        audit(db, request, user, "login.locked")
+        audit(db, request, user, "login.locked", details=details("odbijeno", "nalog je privremeno zaključan"))
         await db.commit()
         raise HTTPException(403, "Nalog je privremeno zaključan zbog više neuspešnih pokušaja prijave.")
 
@@ -50,7 +61,9 @@ async def login(body: LoginIn, request: Request, response: Response, db: AsyncSe
                 user.locked_until = now + timedelta(minutes=settings.login_lock_minutes)
                 user.failed_login_count = 0
                 audit(db, request, user, "user.auto_locked", "user", user.id)
-        audit(db, request, user, "login.failure", details={"username": username}, username=username)
+        reason = ("nepostojeći korisnik" if user is None else "pogrešna lozinka" if not password_ok
+                  else "nalog je deaktiviran")
+        audit(db, request, user, "login.failure", details=details("neuspešno", reason), username=username)
         await db.commit()
         raise HTTPException(401, "Pogrešno korisničko ime ili lozinka.")
 
@@ -72,7 +85,7 @@ async def login(body: LoginIn, request: Request, response: Response, db: AsyncSe
             user_agent=(request.headers.get("user-agent") or "")[:255],
         )
     )
-    audit(db, request, user, "login.success")
+    audit(db, request, user, "login.success", details=details("uspešno"))
     await db.commit()
     login_limiter.reset(ip)
     set_session_cookies(response, token, csrf)

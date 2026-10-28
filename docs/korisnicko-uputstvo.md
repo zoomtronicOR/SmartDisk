@@ -313,6 +313,11 @@ Brisanje uređaja ne briše istoriju njegovih diskova.
 
 **Audit log** (meni) beleži svaku važnu radnju: prijave, izmene uređaja, korisnika i podešavanja, potvrde alarma, backup.
 
+- Za svaku **prijavu**, uspešnu i neuspešnu, beleže se rezultat i razlog (pogrešna lozinka, nepostojeći korisnik, zaključan nalog, previše pokušaja) i podaci o računaru: IP adresa, ime računara (ako ga lokalni DNS zna), pregledač i verzija, operativni sistem (razlikuje i Windows 10 od 11), vrsta uređaja, ekran, jezik, vremenska zona i broj procesorskih jezgara.
+- **Klik na red** otvara prozor sa svim detaljima zapisa.
+- Filter **Samo neuspešne prijave** brzo pokazuje pokušaje sa pogrešnom lozinkom.
+- MAC adresa i korisničko ime na računaru nisu dostupni web aplikaciji. Lozinka se nikad ne upisuje u log.
+
 ---
 
 ## 13. Korisnici i uloge

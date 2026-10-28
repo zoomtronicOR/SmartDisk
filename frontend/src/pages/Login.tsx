@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { HardDrive } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { api } from "../api";
+import { collectClientInfo } from "../clientInfo";
 import { Button, ErrorText, Field, Input } from "../components/ui";
 import type { User } from "../types";
 
@@ -17,7 +18,8 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const user = await api<User>("/auth/login", { method: "POST", body: { username, password } });
+      const client = await collectClientInfo().catch(() => ({}));
+      const user = await api<User>("/auth/login", { method: "POST", body: { username, password, client } });
       queryClient.setQueryData(["me"], user);
     } catch (err) {
       setError(err);

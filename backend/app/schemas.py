@@ -49,6 +49,8 @@ def _validate_interval(value: int | None) -> int | None:
 class LoginIn(BaseModel):
     username: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1, max_length=256)
+    # Podaci o računaru/pregledaču za audit log (ekran, jezik, zona, OS preko Client Hints); bez tajni.
+    client: dict[str, Any] | None = None
 
 
 class ChangePasswordIn(BaseModel):
