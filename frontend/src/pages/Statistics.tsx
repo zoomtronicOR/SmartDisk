@@ -166,7 +166,7 @@ export default function StatisticsPage() {
           <div className="min-w-0 space-y-3">
             <ErrorText error={series.error} />
             {(metric === "total_lbas_written" || metric.endsWith("_errors") || metric.endsWith("_sectors")) && ids.length > 1 && (
-              <Alert tone="info">Raw vrednosti SMART atributa različitih proizvođača nisu nužno iste jedinice – poredite trend, a ne apsolutne vrednosti.</Alert>
+              <Alert tone="info">Raw vrednosti SMART atributa različitih proizvođača nisu nužno iste jedinice - poredite trend, a ne apsolutne vrednosti.</Alert>
             )}
             {!series.data ? (
               ids.length ? <Spinner /> : <EmptyState>Izaberite diskove.</EmptyState>
@@ -194,9 +194,9 @@ export default function StatisticsPage() {
                     <Td>{formatMetric(s.stats.avg == null ? null : s.stats.avg * scale, unit)}</Td>
                     <Td>{formatMetric(s.stats.last == null ? null : s.stats.last * scale, unit)}</Td>
                     <Td className={s.stats.kind === "counter" && (s.stats.delta ?? 0) > 0 ? "font-semibold text-red-600 dark:text-red-400" : ""}>
-                      {s.stats.delta == null ? "—" : `${s.stats.delta > 0 ? "+" : ""}${formatMetric(s.stats.delta * scale, unit)}`}
+                      {s.stats.delta == null ? "-" : `${s.stats.delta > 0 ? "+" : ""}${formatMetric(s.stats.delta * scale, unit)}`}
                     </Td>
-                    <Td>{s.stats.rate_per_day == null ? "—" : formatMetric(s.stats.rate_per_day * scale, unit)}</Td>
+                    <Td>{s.stats.rate_per_day == null ? "-" : formatMetric(s.stats.rate_per_day * scale, unit)}</Td>
                   </tr>
                 ))}
               </Table>
@@ -261,9 +261,9 @@ export default function StatisticsPage() {
                     {formatBytes(p.used_bytes)} / {formatBytes(p.capacity_bytes)}
                     {p.used_bytes != null && p.capacity_bytes ? ` (${Math.round((100 * p.used_bytes) / p.capacity_bytes)}%)` : ""}
                   </Td>
-                  <Td className="whitespace-nowrap">{p.delta_bytes == null ? "—" : `${p.delta_bytes >= 0 ? "+" : "−"}${formatBytes(Math.abs(p.delta_bytes))}`}</Td>
-                  <Td className="whitespace-nowrap">{p.rate_bytes_per_day == null ? "—" : `${p.rate_bytes_per_day >= 0 ? "+" : "−"}${formatBytes(Math.abs(p.rate_bytes_per_day))}`}</Td>
-                  <Td className="whitespace-nowrap">{p.days_to_full == null ? "—" : `~${formatNumber(Math.round(p.days_to_full))} dana`}</Td>
+                  <Td className="whitespace-nowrap">{p.delta_bytes == null ? "-" : `${p.delta_bytes >= 0 ? "+" : "−"}${formatBytes(Math.abs(p.delta_bytes))}`}</Td>
+                  <Td className="whitespace-nowrap">{p.rate_bytes_per_day == null ? "-" : `${p.rate_bytes_per_day >= 0 ? "+" : "−"}${formatBytes(Math.abs(p.rate_bytes_per_day))}`}</Td>
+                  <Td className="whitespace-nowrap">{p.days_to_full == null ? "-" : `~${formatNumber(Math.round(p.days_to_full))} dana`}</Td>
                 </tr>
               ))}
             </Table>
@@ -275,7 +275,7 @@ export default function StatisticsPage() {
                 <tr key={a.id}>
                   <Td><Link to={`/uredjaji/${a.id}`} className="hover:underline">{a.name}</Link></Td>
                   <Td className={a.availability_percent != null && a.availability_percent < 99 ? "font-semibold text-amber-700 dark:text-amber-400" : ""}>
-                    {a.availability_percent == null ? "—" : `${a.availability_percent.toLocaleString("sr-Latn")}%`}
+                    {a.availability_percent == null ? "-" : `${a.availability_percent.toLocaleString("sr-Latn")}%`}
                   </Td>
                   <Td>{a.runs}</Td>
                   <Td>{a.failed}</Td>

@@ -113,12 +113,12 @@ export function DiskCharts({ diskId, diskType }: { diskId: number; diskType: Dis
             <div>
               <dt className="text-slate-500">Promena u periodu</dt>
               <dd className={stats.kind === "counter" && (stats.delta ?? 0) > 0 ? "font-semibold text-red-600 dark:text-red-400" : ""}>
-                {stats.delta == null ? "—" : `${stats.delta > 0 ? "+" : ""}${formatMetric(sv(stats.delta), unit)}`}
+                {stats.delta == null ? "-" : `${stats.delta > 0 ? "+" : ""}${formatMetric(sv(stats.delta), unit)}`}
               </dd>
             </div>
             <div>
               <dt className="text-slate-500">Brzina promene</dt>
-              <dd>{stats.rate_per_day == null ? "—" : `${formatMetric(sv(stats.rate_per_day), unit)} / dan`}</dd>
+              <dd>{stats.rate_per_day == null ? "-" : `${formatMetric(sv(stats.rate_per_day), unit)} / dan`}</dd>
             </div>
           </dl>
         )}
@@ -162,7 +162,7 @@ export function DiskTrendsCard({ diskId }: { diskId: number }) {
                     const bad = t.kind === "counter" && (win.delta ?? 0) > 0;
                     return (
                       <Td key={w.key} className={bad ? "font-semibold text-red-600 dark:text-red-400" : ""}>
-                        {win.delta == null ? "—" : `${win.delta > 0 ? "+" : ""}${formatMetric(win.delta * scale, unit)}`}
+                        {win.delta == null ? "-" : `${win.delta > 0 ? "+" : ""}${formatMetric(win.delta * scale, unit)}`}
                         {partial && win.first_at && (
                           <span className="block text-[11px] font-normal text-slate-500" title={`Prvo očitavanje u prozoru: ${formatDateTime(win.first_at)}`}>
                             podaci od {formatDateTime(win.first_at).slice(0, 10)}

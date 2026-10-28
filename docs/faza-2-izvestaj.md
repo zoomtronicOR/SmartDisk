@@ -1,4 +1,4 @@
-# Izveštaj – Faza 2: Prikupljanje podataka
+# Izveštaj - Faza 2: Prikupljanje podataka
 
 **Datum:** 28.10.2026.
 **Verzija:** 0.2.0 + migracija `0002` (aplikacija je tada greškom još prikazivala 0.1.0)
@@ -48,10 +48,10 @@ Za podešavanje je korišćen privremeni root ključ `claude-smartdisk-setup`. *
 | Scenario | Rezultat |
 |---|---|
 | Dodavanje uređaja, generisanje ključa, potvrda host ključa | otisci u aplikaciji se poklapaju sa `ssh-keygen -lf` na sva tri uređaja |
-| Test konekcije | uspešno (96–858 ms), prepoznati PVE 9.2.21 i TrueNAS-13.0-U6.8 |
-| Prikupljanje – Proxmox i5 | uspešno, 3,1 s: 2 diska (Seagate HDD 1 TB, Kingston NVMe 1 TB), 7 skladišta |
-| Prikupljanje – Proxmox i3 | uspešno, 1,6 s: 1 disk (Lexar SSD 1 TB), 5 skladišta |
-| Prikupljanje – TrueNAS CORE | uspešno, 2,6 s: 10 diskova (9 HDD + NVMe boot), 3 ZFS pool-a; `ses0` (kućište) pravilno preskočen |
+| Test konekcije | uspešno (96-858 ms), prepoznati PVE 9.2.21 i TrueNAS-13.0-U6.8 |
+| Prikupljanje - Proxmox i5 | uspešno, 3,1 s: 2 diska (Seagate HDD 1 TB, Kingston NVMe 1 TB), 7 skladišta |
+| Prikupljanje - Proxmox i3 | uspešno, 1,6 s: 1 disk (Lexar SSD 1 TB), 5 skladišta |
+| Prikupljanje - TrueNAS CORE | uspešno, 2,6 s: 10 diskova (9 HDD + NVMe boot), 3 ZFS pool-a; `ses0` (kućište) pravilno preskočen |
 | Planirano prikupljanje | izvršava se automatski; greške u logu servisa: 0 |
 | Pregled | 3 uređaja, 13 diskova, 15 skladišta, najviša temperatura 49 °C |
 | Skladište | DataPool raidz2 (7 diskova, članovi povezani sa ada0…ada8), **MediaPool bez redundanse** (stripe, 2 diska) prikazan sa upozorenjem, boot-pool single, scrub: datum i 0 grešaka |
@@ -73,7 +73,7 @@ Posle testa nisu brisani podaci: uređaji su stvarni i ostaju u nadzoru.
 - Na Proxmoxu se LVM volume grupa ne povezuje sa fizičkim diskom (kolona „Pool” je prazna). Za to bi bio potreban `pvs`, koji se može dodati u profil.
 - Diskovi iza hardverskog RAID kontrolera (`-d megaraid,N`, `-d cciss,N`) nisu podržani: spec. §6.4 traži poseban profil, a na postojećim uređajima ih nema.
 - Atributi SMART-a se čuvaju u svakom uzorku (JSONB, ~4 KB po očitavanju). Za 13 diskova na 15 minuta to je oko 5 MB dnevno, odnosno ~1,8 GB za 12 meseci. Ako bude potrebno, atributi se mogu čuvati samo kada se promene.
-- Dnevni agregati za podatke starije od perioda čuvanja (spec. §9.2) i grafikoni od–do dolaze u Fazi 3. Do tada se starija merenja brišu tek posle 365 dana.
+- Dnevni agregati za podatke starije od perioda čuvanja (spec. §9.2) i grafikoni od-do dolaze u Fazi 3. Do tada se starija merenja brišu tek posle 365 dana.
 - Stanje diska u Fazi 2 je gruba procena (kritično / upozorenje / bez upozorenja / nema podataka). Ocena „Zdravlje diska”, trendovi i pragovi dolaze u Fazi 4.
 - TrueNAS CORE ima `/usr/local/etc/sudoers` sa pravima 0644 (`visudo -c` upozorava). Tako ga podešava sam TrueNAS, a mi ga ne menjamo.
 

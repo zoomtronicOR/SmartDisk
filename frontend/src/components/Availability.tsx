@@ -76,7 +76,7 @@ export function DeviceAvailability({ deviceId }: { deviceId: number }) {
                     <Td className="whitespace-nowrap">{o.end ? formatDateTime(o.end) : <Badge tone="critical">i dalje traje</Badge>}</Td>
                     <Td>{duration(o.duration_seconds)}</Td>
                     <Td>{o.failed_runs}</Td>
-                    <Td className="max-w-md text-xs">{o.reason ?? "—"}</Td>
+                    <Td className="max-w-md text-xs">{o.reason ?? "-"}</Td>
                   </tr>
                 ))}
               </Table>

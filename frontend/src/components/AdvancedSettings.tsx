@@ -51,7 +51,7 @@ function TimeCard() {
             <dt className="text-slate-500">Sinhronizacija sata (host)</dt>
             <dd>{t.host_synchronized === true ? <Badge tone="ok">Sinhronizovano</Badge> : t.host_synchronized === false ? <Badge tone="critical">Nije sinhronizovano</Badge> : <Badge tone="unknown">Nepoznato</Badge>}</dd>
             <dt className="text-slate-500">Odstupanje od NTP servera</dt>
-            <dd>{t.offset_ms != null ? `${t.offset_ms} ms (kašnjenje mreže ${t.delay_ms} ms, stratum ${t.stratum})` : "—"}</dd>
+            <dd>{t.offset_ms != null ? `${t.offset_ms} ms (kašnjenje mreže ${t.delay_ms} ms, stratum ${t.stratum})` : "-"}</dd>
             <dt className="text-slate-500">Poslednja provera</dt>
             <dd>{formatDateTime(t.checked_at)}</dd>
           </dl>
@@ -82,7 +82,7 @@ function MaintenanceCard() {
     <Card title="Režim održavanja" actions={active ? <Badge tone="warning">Aktivan</Badge> : <Badge tone="unknown">Isključen</Badge>}>
       <div className="max-w-2xl space-y-3 text-sm">
         <p>Tokom održavanja (zamena diska, restart, scrub) šalju se samo <b>kritična</b> obaveštenja. Alarmi se i dalje beleže, a MQTT telemetrija radi.</p>
-        {active && <Alert tone="warning">Održavanje traje do {formatDateTime(until)}{settings.data?.general.maintenance_note ? ` – ${settings.data.general.maintenance_note}` : ""}.</Alert>}
+        {active && <Alert tone="warning">Održavanje traje do {formatDateTime(until)}{settings.data?.general.maintenance_note ? ` - ${settings.data.general.maintenance_note}` : ""}.</Alert>}
         <div className="flex flex-wrap items-end gap-2">
           <Field label="Trajanje (sati)"><Input type="number" min={1} max={168} className="max-w-24" value={hours} onChange={(e) => setHours(Number(e.target.value))} /></Field>
           <Field label="Napomena"><Input className="max-w-72" value={note} onChange={(e) => setNote(e.target.value)} placeholder="npr. zamena diska u DataPool" /></Field>
@@ -245,7 +245,7 @@ function BackupCard() {
         <div className="space-y-3 text-sm">
           {last ? (
             last.status === "ok"
-              ? <Alert tone="ok">Poslednji backup: {formatDateTime(last.finished_at)} – {last.file} ({formatBytes(last.size_bytes)}, provera integriteta: {last.entries} stavki).</Alert>
+              ? <Alert tone="ok">Poslednji backup: {formatDateTime(last.finished_at)} - {last.file} ({formatBytes(last.size_bytes)}, provera integriteta: {last.entries} stavki).</Alert>
               : <Alert tone="critical" title="Poslednji backup nije uspeo">{last.error}</Alert>
           ) : <Alert tone="warning">Backup još nije napravljen.</Alert>}
           <div className="flex flex-wrap items-end gap-3">
@@ -266,7 +266,7 @@ function BackupCard() {
             </Table>
           )}
           <p className="text-xs text-slate-500">
-            Fajlovi su u <code>{q.data.directory}</code> na kontejneru. Backup sadrži bazu i podešavanja, ali <b>ne i master ključ</b> (<code>/etc/smartdisk/smartdisk.env</code>) –
+            Fajlovi su u <code>{q.data.directory}</code> na kontejneru. Backup sadrži bazu i podešavanja, ali <b>ne i master ključ</b> (<code>/etc/smartdisk/smartdisk.env</code>) -
             čuvajte ga posebno, bez njega šifrovani SSH ključevi i lozinke nisu upotrebljivi. Vraćanje je opisano u dokumentaciji (instalacija.md → Backup i vraćanje).
           </p>
         </div>

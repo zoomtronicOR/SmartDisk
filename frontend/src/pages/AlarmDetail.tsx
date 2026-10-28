@@ -67,7 +67,7 @@ export default function AlarmDetailPage() {
             <dt className="text-slate-500">Kategorija / pravilo</dt><dd>{a.category} · <code className="text-xs">{a.rule}</code></dd>
             {a.metric && (<><dt className="text-slate-500">Parametar</dt><dd><code className="text-xs">{a.metric}</code></dd></>)}
             {(a.previous_value != null || a.current_value != null) && (
-              <><dt className="text-slate-500">Prethodna → trenutna</dt><dd>{a.previous_value ?? "—"} → {a.current_value ?? "—"}</dd></>
+              <><dt className="text-slate-500">Prethodna → trenutna</dt><dd>{a.previous_value ?? "-"} → {a.current_value ?? "-"}</dd></>
             )}
             {a.period && (<><dt className="text-slate-500">Period analize</dt><dd>{a.period}</dd></>)}
             <dt className="text-slate-500">Prvi put</dt><dd>{formatDateTime(a.first_seen_at)}</dd>

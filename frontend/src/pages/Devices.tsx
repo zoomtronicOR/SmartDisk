@@ -77,7 +77,7 @@ export default function DevicesPage() {
                     {d.status === "error" && d.last_error && <span className="mt-1 block max-w-xs text-xs text-red-700 dark:text-red-400">{d.last_error}</span>}
                   </Td>
                   <Td className="whitespace-nowrap">
-                    {disks.data ? diskStats(d.id).total : "—"}
+                    {disks.data ? diskStats(d.id).total : "-"}
                     {diskStats(d.id).warnings > 0 && <span className="ml-1"><Badge tone="warning">{diskStats(d.id).warnings} upoz.</Badge></span>}
                   </Td>
                   <Td className="whitespace-nowrap">{formatInterval(d.effective_interval_minutes)}</Td>
@@ -85,7 +85,7 @@ export default function DevicesPage() {
                     <span title={formatDateTime(d.last_success_at)}>{formatRelative(d.last_success_at)}</span>
                   </Td>
                   <Td className="whitespace-nowrap">
-                    <span title={formatDateTime(d.next_run_at)}>{d.next_run_at ? formatRelative(d.next_run_at) : "—"}</span>
+                    <span title={formatDateTime(d.next_run_at)}>{d.next_run_at ? formatRelative(d.next_run_at) : "-"}</span>
                   </Td>
                   <Td className="text-right">
                     {canCollect && d.status !== "not_configured" && (

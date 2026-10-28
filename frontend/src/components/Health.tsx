@@ -12,7 +12,7 @@ const RECOMMENDATIONS: Partial<Record<HealthLevel, string[]>> = {
   endangered: ["Ne koristiti disk za nove kritične podatke.", "Pripremiti zamenski disk.", "Pokrenuti ili proveriti rezervnu kopiju."],
   critical: [
     "Odmah proveriti rezervnu kopiju podataka.",
-    "Zameniti disk što pre (ručno, kroz sistem uređaja – aplikacija ništa ne menja na skladištu).",
+    "Zameniti disk što pre (ručno, kroz sistem uređaja - aplikacija ništa ne menja na skladištu).",
     "Ako je disk u ZFS/RAID nizu, pratiti resilver/rebuild posle zamene.",
   ],
   unknown: ["Proveriti zašto podaci nisu dostupni (veza, SMART podrška, kontroler)."],
@@ -48,12 +48,12 @@ export function DiskHealthCard({ disk }: { disk: Disk }) {
           </div>
           <div>
             <span className="text-slate-500">SMART status: </span>
-            {s ? <Badge tone={SMART_HEALTH[s.smart_health].tone}>{SMART_HEALTH[s.smart_health].label}</Badge> : "—"}
+            {s ? <Badge tone={SMART_HEALTH[s.smart_health].tone}>{SMART_HEALTH[s.smart_health].label}</Badge> : "-"}
           </div>
           <div className="text-xs text-slate-500">Procenjeno {formatRelative(h.updated_at)} ({formatDateTime(h.updated_at)})</div>
         </div>
         {s?.smart_health === "passed" && ["attention", "endangered", "critical"].includes(h.level) && (
-          <Alert tone="warning">SMART status je PASSED, ali istorija pokazuje probleme – zato je zdravlje niže. SMART PASSED ne znači da je disk ispravan.</Alert>
+          <Alert tone="warning">SMART status je PASSED, ali istorija pokazuje probleme - zato je zdravlje niže. SMART PASSED ne znači da je disk ispravan.</Alert>
         )}
         {h.reasons.length > 0 ? (
           <ul className="space-y-1 text-sm">

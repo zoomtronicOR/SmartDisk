@@ -27,7 +27,7 @@ code,
 }
 
 /* Paleta serija za grafikone (validirana za daltonizam: dataviz validate_palette, svetla i tamna površina).
-   Redosled je deo provere – boje se dodeljuju redom, nikad ciklično. */
+   Redosled je deo provere - boje se dodeljuju redom, nikad ciklično. */
 :root {
   /* Ugrađene kontrole (checkbox, select, datum) prate temu aplikacije, a ne temu operativnog sistema. */
   color-scheme: light;
@@ -58,7 +58,7 @@ code,
   --chart-surface: #0f172a;
 }
 
-/* Korisničko uputstvo (stranica Pomoć) – čitljiva tipografija bez dodatnih paketa */
+/* Korisničko uputstvo (stranica Pomoć) - čitljiva tipografija bez dodatnih paketa */
 .help-doc { line-height: 1.65; font-size: 0.95rem; }
 .help-doc h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 1rem; }
 .help-doc h2 { font-size: 1.35rem; font-weight: 650; margin: 2rem 0 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--chart-grid); scroll-margin-top: 4rem; }

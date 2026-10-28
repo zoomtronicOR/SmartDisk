@@ -119,7 +119,7 @@ def parse_probe(output: str, configured_platform: str) -> ProbeResult:
         )
     for tool in EXPECTED.get(configured_platform, []):
         if not tools.get(tool):
-            warnings.append(f"Alat „{tool}” nije pronađen – nedostupno: {TOOLS[tool]}.")
+            warnings.append(f"Alat „{tool}” nije pronađen - nedostupno: {TOOLS[tool]}.")
 
     epoch = s.get("epoch", "").strip()
     return ProbeResult(os_info[:255], detected, tools, smartctl_version, warnings,

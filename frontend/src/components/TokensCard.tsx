@@ -45,7 +45,7 @@ export default function TokensCard() {
           Token nikad nema administratorska prava. Dokumentacija API-ja: <a className="text-brand-700 hover:underline dark:text-brand-500" href="/api/docs" target="_blank" rel="noreferrer">/api/docs</a>.
         </p>
         {created && (
-          <Alert tone="warning" title="Sačuvajte token sada – kasnije se ne može ponovo prikazati">
+          <Alert tone="warning" title="Sačuvajte token sada - kasnije se ne može ponovo prikazati">
             <div className="mt-1 flex flex-wrap items-center gap-2"><code className="break-all">{created}</code><CopyButton text={created} /></div>
           </Alert>
         )}

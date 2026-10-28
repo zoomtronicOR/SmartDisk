@@ -37,7 +37,7 @@ function UserModal({ user, onClose, onSaved }: { user?: User; onClose: () => voi
   };
 
   return (
-    <Modal title={user ? `Izmena – ${user.username}` : "Novi korisnik"} onClose={onClose}>
+    <Modal title={user ? `Izmena - ${user.username}` : "Novi korisnik"} onClose={onClose}>
       <form onSubmit={submit} className="space-y-3">
         {!user && (
           <Field label="Korisničko ime">
@@ -49,9 +49,9 @@ function UserModal({ user, onClose, onSaved }: { user?: User; onClose: () => voi
         </Field>
         <Field label="Uloga">
           <Select value={role} onChange={(e) => setRole(e.target.value as Role)}>
-            <option value="admin">Administrator – puni pristup</option>
-            <option value="operator">Operater – pregled, potvrda alarma, ručno prikupljanje</option>
-            <option value="viewer">Pregled – samo čitanje</option>
+            <option value="admin">Administrator - puni pristup</option>
+            <option value="operator">Operater - pregled, potvrda alarma, ručno prikupljanje</option>
+            <option value="viewer">Pregled - samo čitanje</option>
           </Select>
         </Field>
         {user ? (
@@ -82,7 +82,7 @@ function ResetModal({ user, onClose }: { user: User; onClose: () => void }) {
   const [error, setError] = useState<unknown>(null);
   const [saving, setSaving] = useState(false);
   return (
-    <Modal title={`Reset lozinke – ${user.username}`} onClose={onClose}>
+    <Modal title={`Reset lozinke - ${user.username}`} onClose={onClose}>
       <form
         className="space-y-3"
         onSubmit={async (e) => {

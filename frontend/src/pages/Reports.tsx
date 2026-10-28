@@ -18,7 +18,7 @@ const DESCRIPTIONS: Record<string, string> = {
 };
 
 function cell(value: unknown, kind: string): string {
-  if (value == null || value === "") return "—";
+  if (value == null || value === "") return "-";
   if (kind === "datetime" && typeof value === "string") return formatDateTime(value);
   if (typeof value === "boolean") return value ? "da" : "ne";
   if (typeof value === "number") return value.toLocaleString("sr-Latn", { maximumFractionDigits: 2 });

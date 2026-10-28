@@ -30,7 +30,7 @@ RECOMMENDATIONS = {
     ],
     "critical": [
         "Odmah proveriti rezervnu kopiju podataka.",
-        "Zameniti disk što pre (ručno, kroz sistem uređaja – aplikacija ništa ne menja na skladištu).",
+        "Zameniti disk što pre (ručno, kroz sistem uređaja - aplikacija ništa ne menja na skladištu).",
         "Ako je disk u ZFS/RAID nizu, pratiti resilver/rebuild posle zamene.",
     ],
     "unknown": ["Proveriti zašto podaci nisu dostupni (veza, SMART podrška, kontroler)."],
@@ -175,7 +175,7 @@ def _delta(cur: float | None, base: float | None) -> float | None:
 
 def _fmt(v: float | None) -> str:
     if v is None:
-        return "—"
+        return "-"
     return str(int(v)) if float(v).is_integer() else f"{v:.1f}".replace(".", ",")
 
 
@@ -313,7 +313,7 @@ def evaluate_disk(device: Device, disk: Disk, sample: DiskSample | None, last_sm
             add("ssd_life_left", sev, "smart", f"preostali vek SSD-a {life}% na {disk.device_path}",
                 f"Preostali vek SSD-a: {life}% (pragovi: {lim['warning']}/{lim['high']}%).", metric="ssd_life_left", current_value=life)
 
-    # Temperatura (samo iz svežeg očitavanja – standby disk nema trenutnu temperaturu)
+    # Temperatura (samo iz svežeg očitavanja - standby disk nema trenutnu temperaturu)
     if sample is not None and sample.smart_available and sample.temperature_c is not None:
         t = sample.temperature_c
         lim = dict(th["temperature"][_temp_class(disk.disk_type)])
@@ -363,7 +363,7 @@ def disk_health(disk: Disk, sample: DiskSample | None, last_smart: DiskSample | 
     score = max(0, 100 - sum(PENALTY[c.severity] for c in own))
     if level == "excellent" and effective.power_on_hours and effective.power_on_hours > 50_000:
         level = "good"
-        reasons.append({"severity": "info", "rule": "age", "text": f"Disk ima {effective.power_on_hours} radnih sati (preko 50.000) – očekivano habanje."})
+        reasons.append({"severity": "info", "rule": "age", "text": f"Disk ima {effective.power_on_hours} radnih sati (preko 50.000) - očekivano habanje."})
         score = min(score, 90)
     if sample is not None and sample.smart_health == "standby":
         reasons.append({"severity": "info", "rule": "standby", "text": "Disk je u standby režimu; procena je po poslednjem SMART očitavanju."})
@@ -450,7 +450,7 @@ def system_conditions(time_status: dict[str, Any], th: dict[str, Any]) -> list[C
         out.append(Condition("system:time_offset", sev, "system", "time_offset",
                              f"Sat servera odstupa {offset / 1000:+.1f} s od NTP-a",
                              f"Sat SmartDisk servera odstupa {offset:+.0f} ms od {time_status.get('ntp_server')}. "
-                             "U LXC kontejneru sat dolazi od Proxmox hosta – proverite NTP na hostu.",
+                             "U LXC kontejneru sat dolazi od Proxmox hosta - proverite NTP na hostu.",
                              None, metric="time_offset_ms", current_value=offset))
     if time_status.get("host_synchronized") is False:
         out.append(Condition("system:time_unsynced", "warning", "system", "time_unsynced",

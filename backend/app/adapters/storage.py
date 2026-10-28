@@ -246,7 +246,7 @@ def lvm_pools(lvs_text: str, vgs_text: str) -> list[PoolReading]:
             status="partial" if partial else "ok", healthy=not partial,
             capacity_bytes=size, free_bytes=free,
             used_bytes=size - free if size is not None and free is not None else None,
-            message="Volume group je delimičan – nedostaje fizički volumen." if partial else None,
+            message="Volume group je delimičan - nedostaje fizički volumen." if partial else None,
             details={"pv_count": _int(vg.get("pv_count")), "lv_count": _int(vg.get("lv_count")), "attr": attr},
         ))
     lvs = _lvm_rows(lvs_text, "lv")

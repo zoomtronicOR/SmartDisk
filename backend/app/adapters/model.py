@@ -103,7 +103,7 @@ class PoolReading:
     checksum_errors: int | None = None
     scan_type: str | None = None  # scrub / resilver
     scan_state: str | None = None  # in_progress / finished / canceled / none
-    scan_progress: float | None = None  # 0–100
+    scan_progress: float | None = None  # 0-100
     scan_errors: int | None = None
     scan_finished_at: str | None = None  # kako ga ispisuje alat (lokalno vreme uređaja)
     scan_text: str | None = None

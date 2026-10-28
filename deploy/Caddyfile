@@ -1,4 +1,4 @@
-# SmartDisk – generiše deploy/install.sh (__SITES__ se zamenjuje adresama kontejnera).
+# SmartDisk - generiše deploy/install.sh (__SITES__ se zamenjuje adresama kontejnera).
 # `tls internal` koristi lokalni Caddy CA; za pouzdan sertifikat u pregledaču instalirati
 # /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt kao pouzdan CA.
 __SITES__ {

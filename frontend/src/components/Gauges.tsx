@@ -9,7 +9,7 @@ import { EmptyState } from "./ui";
 type Zone = { from: number; to: number; tone: "ok" | "info" | "warning" | "critical"; label: string };
 type Scale = { min: number; max: number; zones: Zone[]; unit: string };
 
-// Statusne boje (rezervisane za stanje, nikad za seriju) – uvek uz tekstualnu oznaku zone.
+// Statusne boje (rezervisane za stanje, nikad za seriju) - uvek uz tekstualnu oznaku zone.
 const ZONE_COLOR: Record<Zone["tone"], string> = {
   ok: "#0ca30c",
   info: "#2a78d6",

@@ -22,7 +22,7 @@ import { Alert, Badge, Button, EmptyState, Table, Td } from "./ui";
 /** Serijski broj je podrazumevano maskiran; prikazuje se klikom (spec. 6.2). */
 export function SerialNumber({ serial }: { serial: string | null }) {
   const [shown, setShown] = useState(false);
-  if (!serial) return <span>—</span>;
+  if (!serial) return <span>-</span>;
   return (
     <span className="inline-flex items-center gap-1">
       <span className="mono">{shown ? serial : maskSerial(serial)}</span>
@@ -40,7 +40,7 @@ export function SerialNumber({ serial }: { serial: string | null }) {
 }
 
 export function Temperature({ value }: { value: number | null | undefined }) {
-  if (value == null) return <span className="text-slate-400">—</span>;
+  if (value == null) return <span className="text-slate-400">-</span>;
   const cls = value >= 60 ? "text-red-600 dark:text-red-400" : value >= 50 ? "text-amber-600 dark:text-amber-400" : "";
   return (
     <span className={`inline-flex items-center gap-0.5 whitespace-nowrap ${cls}`}>
@@ -50,9 +50,9 @@ export function Temperature({ value }: { value: number | null | undefined }) {
   );
 }
 
-/** allocation: prostor dodeljen volumenima (LVM VG) – visok procenat je uobičajen i nije upozorenje. */
+/** allocation: prostor dodeljen volumenima (LVM VG) - visok procenat je uobičajen i nije upozorenje. */
 export function UsageBar({ used, total, allocation }: { used: number | null; total: number | null; allocation?: boolean }) {
-  if (used == null || !total) return <span className="text-slate-400">—</span>;
+  if (used == null || !total) return <span className="text-slate-400">-</span>;
   const pct = Math.min(100, (used / total) * 100);
   const color = allocation ? "bg-slate-400 dark:bg-slate-500" : pct >= 90 ? "bg-red-500" : pct >= 80 ? "bg-amber-500" : "bg-brand-600";
   return (
@@ -82,7 +82,7 @@ function errorCount(d: Disk): number | null {
 
 function errorSummary(d: Disk): string {
   const s = effectiveSample(d);
-  if (!s) return "—";
+  if (!s) return "-";
   if (d.disk_type === "nvme") {
     return `media ${formatNumber(s.media_errors)} · istrošenost ${formatNumber(s.percentage_used, "%")}`;
   }
@@ -178,7 +178,7 @@ export function DiskTable({ disks, showDevice }: { disks: Disk[]; showDevice?: b
                 {d.health.reasons.length > 0 && <span className="mt-0.5 block max-w-56 text-xs text-slate-500">{d.health.reasons[0].text.slice(0, 120)}</span>}
               </Td>
               <Td>
-                {smart ? <Badge tone={smart.tone}>{smart.label}</Badge> : "—"}
+                {smart ? <Badge tone={smart.tone}>{smart.label}</Badge> : "-"}
                 {standby && <span className="mt-0.5 block"><Badge tone="info">Standby</Badge></span>}
               </Td>
               <Td className="whitespace-nowrap">
@@ -189,7 +189,7 @@ export function DiskTable({ disks, showDevice }: { disks: Disk[]; showDevice?: b
               <Td><Temperature value={s?.temperature_c} /></Td>
               <Td className="whitespace-nowrap">{formatHours(s?.power_on_hours)}</Td>
               <Td className="whitespace-nowrap text-xs">{errorSummary(d)}</Td>
-              <Td className="text-xs">{d.pools.join(", ") || "—"}</Td>
+              <Td className="text-xs">{d.pools.join(", ") || "-"}</Td>
               <Td className="whitespace-nowrap text-xs" >
                 <span title={formatDateTime(d.latest?.collected_at)}>{formatRelative(d.latest?.collected_at)}</span>
               </Td>
@@ -200,7 +200,7 @@ export function DiskTable({ disks, showDevice }: { disks: Disk[]; showDevice?: b
       {pages > 1 && (
         <div className="mt-3 flex items-center justify-end gap-2 text-sm">
           <span className="text-slate-500">
-            {current * PAGE_SIZE + 1}–{Math.min(sorted.length, (current + 1) * PAGE_SIZE)} od {sorted.length}
+            {current * PAGE_SIZE + 1}-{Math.min(sorted.length, (current + 1) * PAGE_SIZE)} od {sorted.length}
           </span>
           <Button size="sm" disabled={current === 0} onClick={() => setPage(current - 1)}>Prethodna</Button>
           <Button size="sm" disabled={current >= pages - 1} onClick={() => setPage(current + 1)}>Sledeća</Button>
@@ -262,7 +262,7 @@ export function PoolCard({ pool, showDevice, link = true }: { pool: Pool; showDe
             <>
               <dt className="text-slate-500">{pool.scan_type ? SCAN_LABEL[pool.scan_type] ?? pool.scan_type : "Scrub"}</dt>
               <dd>
-                {pool.scan_state === "in_progress" && `u toku${pool.scan_progress != null ? ` – ${pool.scan_progress.toLocaleString("sr-Latn")}%` : ""}`}
+                {pool.scan_state === "in_progress" && `u toku${pool.scan_progress != null ? ` - ${pool.scan_progress.toLocaleString("sr-Latn")}%` : ""}`}
                 {pool.scan_state === "finished" && (
                   <>
                     završen {pool.scan_finished_at ?? ""}

@@ -20,4 +20,4 @@ def decrypt(value: str) -> str:
     try:
         return _fernet().decrypt(value.encode()).decode()
     except InvalidToken as exc:
-        raise ValueError("Tajna ne može da se dešifruje – proverite SMARTDISK_MASTER_KEY.") from exc
+        raise ValueError("Tajna ne može da se dešifruje - proverite SMARTDISK_MASTER_KEY.") from exc

@@ -64,7 +64,7 @@ export default function AccountPage({ forced = false }: { forced?: boolean }) {
           <Alert tone="warning" title="Potrebna je nova lozinka">
             Administrator je postavio privremenu lozinku. Pre nastavka rada postavite sopstvenu.
           </Alert>
-          <Card title={`Promena lozinke – ${user?.username}`} actions={<Button size="sm" variant="ghost" onClick={logout}>Odjava</Button>}>
+          <Card title={`Promena lozinke - ${user?.username}`} actions={<Button size="sm" variant="ghost" onClick={logout}>Odjava</Button>}>
             {form}
           </Card>
         </div>
@@ -82,7 +82,7 @@ export default function AccountPage({ forced = false }: { forced?: boolean }) {
           <dt className="text-slate-500">Uloga</dt>
           <dd>{user && ROLE_LABELS[user.role]}</dd>
           <dt className="text-slate-500">E-mail</dt>
-          <dd>{user?.email || "—"}</dd>
+          <dd>{user?.email || "-"}</dd>
           <dt className="text-slate-500">Poslednja prijava</dt>
           <dd>{formatDateTime(user?.last_login_at)}</dd>
         </dl>

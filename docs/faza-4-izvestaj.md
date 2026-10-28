@@ -1,4 +1,4 @@
-# Izveštaj – Faza 4: Analiza degradacije i alarmiranje
+# Izveštaj - Faza 4: Analiza degradacije i alarmiranje
 
 **Datum:** 28.10.2026.
 **Verzija:** 0.4.0 + migracija `0004` (aplikacija je tada greškom još prikazivala 0.1.0)
@@ -8,7 +8,7 @@
 
 | Stavka | Stanje | Gde |
 |---|---|---|
-| „Zdravlje diska” (spec. §8.8) | ✓ 6 nivoa, ocena 0–100, razlozi, preporuke (§8.12); nezavisno od SMART statusa | `health.py: disk_health`, `components/Health.tsx` |
+| „Zdravlje diska” (spec. §8.8) | ✓ 6 nivoa, ocena 0-100, razlozi, preporuke (§8.12); nezavisno od SMART statusa | `health.py: disk_health`, `components/Health.tsx` |
 | Trendovi 24 h / 7 d / 30 d | ✓ (iz Faze 3) + koriste se u pravilima | `health._history`, `/api/disks/{id}/trends` |
 | Postepena i ubrzana degradacija | ✓ realocirani, pending i neispravljivi sektori, CRC; pragovi po prozoru | `health.evaluate_disk` |
 | NVMe degradacija | ✓ critical warning, media greške između očitavanja, rezerva, istrošenost, log grešaka, nebezbedna gašenja | isto |
@@ -20,7 +20,7 @@
 | Browser Push | ✓ VAPID, service worker, nivo, uređaji, utišavanje, proba, evidencija | `notify/push.py`, `public/sw.js`, `components/PushCard.tsx` |
 | MQTT | ✓ LWT, retain, heartbeat, ponovno povezivanje, QoS 1 za događaje, test veze, status | `notify/mqtt.py` |
 | Home Assistant Discovery | ✓ entiteti po vrsti, uključivanje/isključivanje | isto |
-| **E-pošta (SMTP)** – dodato na zahtev | ✓ STARTTLS/SSL, šifrovana lozinka, primaoci, najniži nivo, probna poruka | `notify/email.py` |
+| **E-pošta (SMTP)** - dodato na zahtev | ✓ STARTTLS/SSL, šifrovana lozinka, primaoci, najniži nivo, probna poruka | `notify/email.py` |
 
 Dokumentacija za korisnika: [obavestenja.md](obavestenja.md).
 

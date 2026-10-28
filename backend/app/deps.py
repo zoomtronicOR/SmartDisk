@@ -120,7 +120,7 @@ admin_only = require_roles("admin")
 
 
 async def session_user(request: Request, user: User = Depends(current_user)) -> User:
-    """Samo prijavljen korisnik (kolačić), ne API token – za upravljanje tokenima i slično."""
+    """Samo prijavljen korisnik (kolačić), ne API token - za upravljanje tokenima i slično."""
     if getattr(request.state, "api_token_id", None):
         raise HTTPException(403, "Ova radnja nije dozvoljena API tokenom.")
     return user

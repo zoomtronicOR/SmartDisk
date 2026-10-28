@@ -251,7 +251,7 @@ export default function DeviceDetailPage() {
                       })
                     }
                   >
-                    Otisak se poklapa – potvrđujem
+                    Otisak se poklapa - potvrđujem
                   </Button>
                   <Button size="sm" onClick={() => setHostKey(null)}>
                     Odustani
@@ -317,7 +317,7 @@ export default function DeviceDetailPage() {
                   {d.last_error && <span className="block text-red-700 dark:text-red-400">{d.last_error}</span>}
                 </>
               ) : (
-                "—"
+                "-"
               )}
             </dd>
             <dt className="text-slate-500">Timeout</dt>
@@ -325,7 +325,7 @@ export default function DeviceDetailPage() {
               konekcija {d.connect_timeout} s, komande {d.command_timeout} s
             </dd>
             <dt className="text-slate-500">Lokacija</dt>
-            <dd>{d.location || "—"}</dd>
+            <dd>{d.location || "-"}</dd>
             <dt className="text-slate-500">Dodat</dt>
             <dd>{formatDateTime(d.created_at)}</dd>
           </dl>

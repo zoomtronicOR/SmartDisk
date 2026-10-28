@@ -7,7 +7,7 @@ export function setDisplayTimezone(tz: string) {
 }
 
 export function formatDateTime(iso: string | null | undefined): string {
-  if (!iso || Number.isNaN(new Date(iso).getTime())) return "—"; // neispravan datum ne sme da obori ekran
+  if (!iso || Number.isNaN(new Date(iso).getTime())) return "-"; // neispravan datum ne sme da obori ekran
   return new Intl.DateTimeFormat("sr-Latn-RS", {
     timeZone: timezone,
     day: "2-digit",
@@ -20,7 +20,7 @@ export function formatDateTime(iso: string | null | undefined): string {
 }
 
 export function formatRelative(iso: string | null | undefined): string {
-  if (!iso || Number.isNaN(new Date(iso).getTime())) return "—";
+  if (!iso || Number.isNaN(new Date(iso).getTime())) return "-";
   const diff = Math.round((new Date(iso).getTime() - Date.now()) / 1000);
   const abs = Math.abs(diff);
   const rtf = new Intl.RelativeTimeFormat("sr-Latn", { numeric: "auto" });
@@ -37,7 +37,7 @@ export function formatInterval(minutes: number): string {
 }
 
 export function formatBytes(bytes: number | null | undefined): string {
-  if (bytes == null) return "—";
+  if (bytes == null) return "-";
   const units = ["B", "KB", "MB", "GB", "TB", "PB"];
   let value = bytes;
   let i = 0;
@@ -49,7 +49,7 @@ export function formatBytes(bytes: number | null | undefined): string {
 }
 
 export function formatDuration(ms: number | null): string {
-  if (ms == null) return "—";
+  if (ms == null) return "-";
   if (ms < 1000) return `${ms} ms`;
   return `${(ms / 1000).toLocaleString("sr-Latn", { maximumFractionDigits: 1 })} s`;
 }
@@ -84,20 +84,20 @@ export const RUN_TRIGGER: Record<Run["trigger"], string> = {
 export type Tone = "ok" | "warning" | "critical" | "unknown" | "info";
 
 export function formatNumber(value: number | null | undefined, suffix = ""): string {
-  if (value == null) return "—";
+  if (value == null) return "-";
   return `${value.toLocaleString("sr-Latn")}${suffix}`;
 }
 
 /** Sati rada: „34.565 h (3,9 god.)”. */
 export function formatHours(hours: number | null | undefined): string {
-  if (hours == null) return "—";
+  if (hours == null) return "-";
   const years = hours / 8766;
   return `${hours.toLocaleString("sr-Latn")} h` + (years >= 0.1 ? ` (${years.toLocaleString("sr-Latn", { maximumFractionDigits: 1 })} god.)` : "");
 }
 
 /** Kapacitet diska se iskazuje decimalno, kao na nalepnici diska (8 TB, 1 TB). */
 export function formatCapacity(bytes: number | null | undefined): string {
-  if (bytes == null) return "—";
+  if (bytes == null) return "-";
   const units = ["B", "KB", "MB", "GB", "TB", "PB"];
   let value = bytes;
   let i = 0;
@@ -110,13 +110,13 @@ export function formatCapacity(bytes: number | null | undefined): string {
 
 /** NVMe „data units” su po 512 000 bajtova. */
 export function formatDataUnits(units: number | null | undefined): string {
-  if (units == null) return "—";
+  if (units == null) return "-";
   // Isto kao zauzeće i grafikoni (binarne jedinice), da se iste vrednosti ne razlikuju po ekranima.
   return formatBytes(units * 512_000);
 }
 
 export function maskSerial(serial: string | null): string {
-  if (!serial) return "—";
+  if (!serial) return "-";
   if (serial.length <= 4) return "••••";
   return "•".repeat(Math.min(serial.length - 4, 8)) + serial.slice(-4);
 }
@@ -185,7 +185,7 @@ export const ALARM_STATUS: Record<AlarmStatus, { label: string; tone: Tone }> = 
   resolved: { label: "Rešen", tone: "ok" },
 };
 
-/** „Zdravlje diska” (spec. §8.8) – zaseban indikator, nezavisan od SMART statusa. */
+/** „Zdravlje diska” (spec. §8.8) - zaseban indikator, nezavisan od SMART statusa. */
 export const HEALTH: Record<HealthLevel, { label: string; tone: Tone }> = {
   excellent: { label: "Odlično", tone: "ok" },
   good: { label: "Dobro", tone: "ok" },

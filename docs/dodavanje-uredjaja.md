@@ -8,11 +8,11 @@ Tačan spisak komandi i gotov sudoers fajl za svaku platformu prikazuje i sama a
 
 1. Na uređaju napraviti nalog `diskmonitor` i sudo profil (odeljci ispod, po platformi).
 2. U aplikaciji: *Uređaji → Dodaj uređaj*: naziv, platforma, IP adresa, port, korisnik `diskmonitor`. Novi uređaj je **isključen**.
-3. **Korak 1 – SSH ključ:** *Generiši ključ* napravi ed25519 par. Javni ključ (*Kopiraj*) dodati nalogu na uređaju (odeljci ispod). Preporuka je da ključ važi samo za adresu SmartDisk kontejnera:
+3. **Korak 1 - SSH ključ:** *Generiši ključ* napravi ed25519 par. Javni ključ (*Kopiraj*) dodati nalogu na uređaju (odeljci ispod). Preporuka je da ključ važi samo za adresu SmartDisk kontejnera:
    ```text
    from="192.168.88.246",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty ssh-ed25519 AAAA… smartdisk-<id>
    ```
-4. **Korak 2 – host ključ:** *Preuzmi otisak host ključa*, pa ga uporediti sa otiskom na samom uređaju (konzola ili već pouzdana SSH sesija). Tek ako se poklapaju: *Otisak se poklapa – potvrđujem*.
+4. **Korak 2 - host ključ:** *Preuzmi otisak host ključa*, pa ga uporediti sa otiskom na samom uređaju (konzola ili već pouzdana SSH sesija). Tek ako se poklapaju: *Otisak se poklapa - potvrđujem*.
 
    | Platforma | Komanda na uređaju |
    |---|---|

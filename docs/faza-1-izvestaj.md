@@ -1,4 +1,4 @@
-# Izveštaj – Faza 1: Osnova aplikacije
+# Izveštaj - Faza 1: Osnova aplikacije
 
 **Datum:** 28.10.2026.
 **Verzija:** 0.1.0

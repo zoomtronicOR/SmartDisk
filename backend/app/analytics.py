@@ -20,7 +20,7 @@ class Metric:
     column: str
     label: str
     unit: str
-    agg: str  # avg / max / min – kako se vrednost svodi na interval
+    agg: str  # avg / max / min - kako se vrednost svodi na interval
     daily: str | None  # kolona u disk_daily/pool_daily (None = nema u agregatu)
     kind: str = "gauge"  # gauge / counter (brojač koji ne bi smeo da raste)
 
@@ -311,9 +311,9 @@ PREDICT_DISK = {
 
 def _quality(n: int, span_days: float, r2: float | None) -> tuple[str, str]:
     if n < 10 or span_days < 7:
-        return "low", f"Malo podataka ({n} očitavanja za {span_days:.1f} dana) – procena nije pouzdana."
+        return "low", f"Malo podataka ({n} očitavanja za {span_days:.1f} dana) - procena nije pouzdana."
     if r2 is not None and r2 < 0.5:
-        return "medium", f"Vrednosti nisu ravnomerne (R² = {r2:.2f}) – trend je okviran."
+        return "medium", f"Vrednosti nisu ravnomerne (R² = {r2:.2f}) - trend je okviran."
     return "good", f"{n} očitavanja za {span_days:.0f} dana" + (f", R² = {r2:.2f}" if r2 is not None else "") + "."
 
 

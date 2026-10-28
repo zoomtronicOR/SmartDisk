@@ -53,9 +53,9 @@ async def send(schedule: dict[str, Any]) -> str:
             attachments.append((f"smartdisk-{kind}-{end:%Y%m%d}.{fmt}", data, export.FORMATS[fmt]))
             summary_lines.append(f"- {report.title}: {len(report.rows)} redova")
         period_label = {"daily": "Dnevni", "weekly": "Nedeljni", "monthly": "Mesečni"}.get(schedule.get("period"), "")
-        subject = f"[SmartDisk] {period_label} izveštaj – {schedule.get('name') or ''}".strip()
-        body = (f"{period_label} izveštaj za period {start:%d.%m.%Y. %H:%M} – {end:%d.%m.%Y. %H:%M}.\n\n"
-                + "\n".join(summary_lines) + "\n\nIzveštaji su u prilogu.\n\n— SmartDisk (automatska poruka)")
+        subject = f"[SmartDisk] {period_label} izveštaj - {schedule.get('name') or ''}".strip()
+        body = (f"{period_label} izveštaj za period {start:%d.%m.%Y. %H:%M} - {end:%d.%m.%Y. %H:%M}.\n\n"
+                + "\n".join(summary_lines) + "\n\nIzveštaji su u prilogu.\n\n- SmartDisk (automatska poruka)")
         recipients = schedule.get("recipients") or mail.get("recipients") or []
         try:
             await email.send(mail, subject, body, recipients, attachments)

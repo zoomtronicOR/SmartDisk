@@ -177,7 +177,7 @@ async def _collect(device_id: int, trigger: str, initiated_by: str | None) -> in
             for tool, path in probe.tools.items():
                 details = path or "Nije pronađen"
                 if tool == "smartctl" and probe.smartctl_version:
-                    details = f"{path} – {probe.smartctl_version}"
+                    details = f"{path} - {probe.smartctl_version}"
                 stmt = insert(DeviceCapability).values(
                     device_id=device_id, capability=tool, available=bool(path), details=details, checked_at=now
                 )

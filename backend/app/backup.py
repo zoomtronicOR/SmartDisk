@@ -1,7 +1,7 @@
 """Backup baze (spec. §16.5): pg_dump u custom formatu, provera integriteta (pg_restore --list), rotacija.
 
 Baza sadrži i podešavanja aplikacije i šifrovane kredencijale. Master ključ (/etc/smartdisk/smartdisk.env)
-se NE nalazi u backup-u i čuva se odvojeno – bez njega šifrovani SSH ključevi i lozinke nisu upotrebljivi.
+se NE nalazi u backup-u i čuva se odvojeno - bez njega šifrovani SSH ključevi i lozinke nisu upotrebljivi.
 """
 
 import asyncio

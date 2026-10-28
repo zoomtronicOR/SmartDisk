@@ -60,11 +60,11 @@ export default function SettingsPage() {
 
       <Card title="Prikupljanje podataka">
         <div className="max-w-lg space-y-3">
-          <Field label="Globalni podrazumevani interval" hint="Važi za sve uređaje koji nemaju sopstveni interval. Promena se primenjuje odmah, bez restarta – sledeći ciklus je „sada + novi interval”. Dozvoljeno: 1 minut – 7 dana.">
+          <Field label="Globalni podrazumevani interval" hint="Važi za sve uređaje koji nemaju sopstveni interval. Promena se primenjuje odmah, bez restarta - sledeći ciklus je „sada + novi interval”. Dozvoljeno: 1 minut - 7 dana.">
             <IntervalInput value={interval} onChange={setInterval} />
           </Field>
           {interval < 5 && <Alert tone="warning">Interval kraći od 5 minuta može nepotrebno opteretiti uređaje.</Alert>}
-          <Field label="Čuvanje sirovih merenja (dana)" hint="Svako SMART i pool očitavanje čuva se ovoliko dana, a zatim se briše (svake noći u 03:30). Podrazumevano 365 dana. Dozvoljeno: 30–3650.">
+          <Field label="Čuvanje sirovih merenja (dana)" hint="Svako SMART i pool očitavanje čuva se ovoliko dana, a zatim se briše (svake noći u 03:30). Podrazumevano 365 dana. Dozvoljeno: 30-3650.">
             <Input type="number" min={30} max={3650} value={retention} onChange={(e) => setRetention(Number(e.target.value))} />
           </Field>
           {saved === "collection" && <Alert tone="ok">Podešavanja prikupljanja su sačuvana i primenjena.</Alert>}

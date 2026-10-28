@@ -53,7 +53,7 @@ def disk_findings(sample: DiskSample | None, present: bool, last_smart: DiskSamp
         if last_smart is not None:
             state, reasons = disk_findings(last_smart, True)
             return state, ["Disk je u standby režimu; stanje je po poslednjem SMART očitavanju."] + reasons
-        return "unknown", ["Disk je u standby režimu – SMART još nije očitan."]
+        return "unknown", ["Disk je u standby režimu - SMART još nije očitan."]
     if sample.smart_health in ("unavailable", "unknown"):
         return "unknown", [sample.smart_message or "SMART podaci nisu dostupni."]
     reasons = []

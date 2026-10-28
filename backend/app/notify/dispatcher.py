@@ -16,7 +16,7 @@ from . import channels, config, email, mqtt, push
 log = logging.getLogger("smartdisk.notify")
 
 SEVERITY_LABEL = {"info": "Informacija", "warning": "Upozorenje", "high": "Visoko", "critical": "Kritično"}
-KIND_LABEL = {"opened": "", "escalated": "Pogoršanje – ", "reminder": "Podsetnik – ", "resolved": "Rešeno – "}
+KIND_LABEL = {"opened": "", "escalated": "Pogoršanje - ", "reminder": "Podsetnik - ", "resolved": "Rešeno - "}
 
 
 def _text(event: Event, kind: str) -> tuple[str, str]:
@@ -89,9 +89,9 @@ async def _dispatch_one(notice: Notice) -> None:
 
         mail = await config.load(db, config.EMAIL)
         if mail.get("enabled") and SEVERITY_RANK[event.severity] >= SEVERITY_RANK[mail.get("min_severity", "high")]:
-            text = (f"{body}\n\nUređaj: {device.name if device else '—'}\nNivo: {SEVERITY_LABEL[event.severity]}\n"
+            text = (f"{body}\n\nUređaj: {device.name if device else '-'}\nNivo: {SEVERITY_LABEL[event.severity]}\n"
                     f"Prvi put: {event.first_seen_at:%d.%m.%Y. %H:%M} UTC · ponavljanja: {event.occurrence_count}\n"
-                    f"Detalji: {url}\n\n— SmartDisk (automatska poruka)")
+                    f"Detalji: {url}\n\n- SmartDisk (automatska poruka)")
             try:
                 await email.send(mail, f"[SmartDisk] {title}", text)
                 logs.append(NotificationLog(event_id=event.id, channel="email", target=", ".join(mail.get("recipients") or []), status="sent"))
@@ -160,7 +160,7 @@ async def send_test(channel: str, cfg: dict[str, Any] | None = None, subscriptio
             subject = f"mailto:{mail['from_addr']}" if mail.get("from_addr") else "mailto:smartdisk@example.invalid"
             try:
                 await push.send({"endpoint": sub.endpoint, "p256dh": sub.p256dh, "auth": sub.auth},
-                                {"title": "SmartDisk – probno obaveštenje", "body": "Web Push obaveštenja rade.",
+                                {"title": "SmartDisk - probno obaveštenje", "body": "Web Push obaveštenja rade.",
                                  "url": "/alarmi", "tag": "smartdisk-test"}, keys["private_pem"], subject)
             except Exception as exc:
                 raise ValueError(f"Slanje nije uspelo: {exc}") from exc

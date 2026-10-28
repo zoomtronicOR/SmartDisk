@@ -122,8 +122,8 @@ async def test_channel(name: str, body: ChannelIn, _: User = Depends(admin_only)
     cfg = _apply(channels.merged(await config.load_raw(db, channels.CHANNELS))[name], name, body)
     general = await config.load(db, config.GENERAL)
     try:
-        await channels.send(name, cfg, "SmartDisk – probna poruka", "Ovaj kanal obaveštenja radi.",
-                            (general.get("base_url") or None), "info", {"test": True, "title": "SmartDisk – probna poruka"})
+        await channels.send(name, cfg, "SmartDisk - probna poruka", "Ovaj kanal obaveštenja radi.",
+                            (general.get("base_url") or None), "info", {"test": True, "title": "SmartDisk - probna poruka"})
     except channels.ChannelError as exc:
         raise HTTPException(422, str(exc)) from exc
     return {"message": "Probna poruka je poslata."}

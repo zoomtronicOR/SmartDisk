@@ -42,11 +42,11 @@ export default function DashboardPage() {
           label="Skladište"
           value={data.pools_total}
           tone={data.pools_problem ? "critical" : undefined}
-          sub={data.pools_problem ? `${data.pools_problem} sa problemom` : data.pools_scanning ? `${data.pools_scanning} – provera u toku` : "bez problema"}
+          sub={data.pools_problem ? `${data.pools_problem} sa problemom` : data.pools_scanning ? `${data.pools_scanning} - provera u toku` : "bez problema"}
         />
         <Stat
           label="Temperatura"
-          value={data.max_temperature_c != null ? `${data.max_temperature_c} °C` : "—"}
+          value={data.max_temperature_c != null ? `${data.max_temperature_c} °C` : "-"}
           tone={data.hot_disks ? "warning" : undefined}
           sub={`najviša · ${data.hot_disks} disk(a) iznad praga za svoj tip · SMART FAILED: ${data.smart_failed_disks}`}
         />
@@ -71,7 +71,7 @@ export default function DashboardPage() {
             {data.disks_total === 0
               ? "Još nema podataka o diskovima."
               : ds.unknown > 0
-                ? `Nema diskova ni skladišta sa upozorenjem. Za ${ds.unknown} disk(a) nema SMART podataka – to nije isto što i „ispravno”.`
+                ? `Nema diskova ni skladišta sa upozorenjem. Za ${ds.unknown} disk(a) nema SMART podataka - to nije isto što i „ispravno”.`
                 : "Nema diskova ni skladišta sa upozorenjem."}
           </p>
         ) : (

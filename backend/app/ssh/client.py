@@ -52,7 +52,7 @@ def _map_error(exc: BaseException, timeout: int) -> SSHError:
         return SSHError(
             "host_key_mismatch",
             "Host ključ uređaja se ne poklapa sa potvrđenim otiskom. Moguća je reinstalacija ili zamena "
-            "servera – proverite uređaj, pa ponovo preuzmite i potvrdite ključ.",
+            "servera - proverite uređaj, pa ponovo preuzmite i potvrdite ključ.",
         )
     if isinstance(exc, asyncssh.PermissionDenied):
         return SSHError(
@@ -62,7 +62,7 @@ def _map_error(exc: BaseException, timeout: int) -> SSHError:
     if isinstance(exc, TimeoutError):  # obuhvata i asyncio.TimeoutError
         return SSHError("timeout", f"Isteklo je vreme za povezivanje ({timeout} s).")
     if isinstance(exc, ConnectionRefusedError):
-        return SSHError("unreachable", "Konekcija je odbijena – SSH servis nije dostupan na tom portu.")
+        return SSHError("unreachable", "Konekcija je odbijena - SSH servis nije dostupan na tom portu.")
     if isinstance(exc, socket.gaierror):
         return SSHError("dns", "DNS ime uređaja ne može da se razreši.")
     if isinstance(exc, OSError):
@@ -112,7 +112,7 @@ async def connect(info: ConnInfo) -> AsyncIterator[asyncssh.SSHClientConnection]
     try:
         trusted = asyncssh.import_public_key(info.host_key)
     except (asyncssh.KeyImportError, ValueError) as exc:
-        raise SSHError("host_key", "Sačuvani host ključ je neispravan – ponovo ga preuzmite i potvrdite.") from exc
+        raise SSHError("host_key", "Sačuvani host ključ je neispravan - ponovo ga preuzmite i potvrdite.") from exc
 
     try:
         conn = await asyncio.wait_for(

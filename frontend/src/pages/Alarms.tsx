@@ -13,7 +13,7 @@ const SEVERITY_ORDER: Severity[] = ["critical", "high", "warning", "info"];
 export function AlarmTarget({ a }: { a: Alarm }) {
   return (
     <span className="text-xs text-slate-500">
-      {a.device_id ? <Link to={`/uredjaji/${a.device_id}`} className="hover:underline">{a.device_name}</Link> : "—"}
+      {a.device_id ? <Link to={`/uredjaji/${a.device_id}`} className="hover:underline">{a.device_name}</Link> : "-"}
       {a.disk_id && (
         <> · <Link to={`/diskovi/${a.disk_id}`} className="hover:underline">{a.disk_name}</Link></>
       )}

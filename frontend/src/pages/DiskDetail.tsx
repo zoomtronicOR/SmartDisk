@@ -100,20 +100,20 @@ export default function DiskDetailPage() {
         <div className="lg:col-span-2"><DiskHealthCard disk={d} /></div>
         <Card title="Disk">
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-            <Row label="Model">{d.model ?? "—"}</Row>
-            <Row label="Porodica / proizvođač">{d.vendor ?? "—"}</Row>
+            <Row label="Model">{d.model ?? "-"}</Row>
+            <Row label="Porodica / proizvođač">{d.vendor ?? "-"}</Row>
             <Row label="Serijski broj"><SerialNumber serial={d.serial_number} /></Row>
             <Row label="WWN / identifikator"><span className="mono text-xs">{d.wwn ?? d.stable_identifier}</span></Row>
-            <Row label="Firmware">{d.firmware ?? "—"}</Row>
+            <Row label="Firmware">{d.firmware ?? "-"}</Row>
             <Row label="Tip">{DISK_TYPE[d.disk_type]}{d.rotation_rate ? ` · ${d.rotation_rate} rpm` : ""}{d.form_factor ? ` · ${d.form_factor}` : ""}</Row>
-            <Row label="Veza">{d.interface_type ?? "—"}</Row>
+            <Row label="Veza">{d.interface_type ?? "-"}</Row>
             <Row label="Kapacitet">{formatCapacity(d.capacity_bytes)}</Row>
             <Row label="Prvi put viđen">{formatDateTime(d.first_seen_at)}</Row>
-            <Row label="Poslednje očitavanje">{s ? `${formatDateTime(s.collected_at)} (${formatRelative(s.collected_at)})` : "—"}</Row>
+            <Row label="Poslednje očitavanje">{s ? `${formatDateTime(s.collected_at)} (${formatRelative(s.collected_at)})` : "-"}</Row>
           </dl>
         </Card>
 
-        <Card title="SMART – ključne vrednosti">
+        <Card title="SMART - ključne vrednosti">
           {!s ? (
             <EmptyState>Još nema očitavanja.</EmptyState>
           ) : !s.smart_available ? (
@@ -163,10 +163,10 @@ export default function DiskDetailPage() {
                 <tr key={a.id} className={failing ? "bg-red-50 dark:bg-red-950/40" : ""}>
                   <Td>{a.id}</Td>
                   <Td className="mono text-xs">{a.name}</Td>
-                  <Td>{a.value ?? "—"}</Td>
-                  <Td>{a.worst ?? "—"}</Td>
-                  <Td>{a.thresh ?? "—"}</Td>
-                  <Td className="mono text-xs">{a.raw_string ?? a.raw ?? "—"}</Td>
+                  <Td>{a.value ?? "-"}</Td>
+                  <Td>{a.worst ?? "-"}</Td>
+                  <Td>{a.thresh ?? "-"}</Td>
+                  <Td className="mono text-xs">{a.raw_string ?? a.raw ?? "-"}</Td>
                   <Td className="text-xs">{a.prefail ? "Pre-fail" : "Old-age"}</Td>
                   <Td>
                     {failing ? <Badge tone="critical">Ispod praga</Badge> : past ? <Badge tone="warning">Bio ispod praga</Badge> : <Badge tone="ok">OK</Badge>}
@@ -199,7 +199,7 @@ export default function DiskDetailPage() {
                   <Badge tone={t.passed === true ? "ok" : t.passed === false ? "critical" : "unknown"}>{t.status}</Badge>
                   {t.remaining_percent != null && t.remaining_percent > 0 && <span className="ml-1 text-xs text-slate-500">preostalo {t.remaining_percent}%</span>}
                 </Td>
-                <Td>{t.lifetime_hours != null ? formatHours(t.lifetime_hours) : "—"}</Td>
+                <Td>{t.lifetime_hours != null ? formatHours(t.lifetime_hours) : "-"}</Td>
                 <Td>{formatDateTime(t.first_seen_at)}</Td>
               </tr>
             ))}

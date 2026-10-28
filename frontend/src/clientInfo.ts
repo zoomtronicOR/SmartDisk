@@ -37,7 +37,7 @@ export async function collectClientInfo(): Promise<Record<string, unknown>> {
       const main = brands.find((b) => !/Not.?A.?Brand|Chromium/i.test(b.brand)) ?? brands[0];
       if (main) info.browser_full = `${main.brand} ${main.version}`;
     } catch {
-      /* pregledač ne dozvoljava detaljne podatke – šalje se ono što postoji */
+      /* pregledač ne dozvoljava detaljne podatke - šalje se ono što postoji */
     }
   }
   return info;

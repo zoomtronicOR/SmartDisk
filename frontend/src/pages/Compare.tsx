@@ -15,12 +15,12 @@ type Row = { label: string; value: (d: DiskDetail, s: DiskSample | null) => stri
 const ROWS: Row[] = [
   { label: "Uređaj", value: (d) => d.device_name },
   { label: "Putanja", value: (d) => d.device_path },
-  { label: "Proizvođač / porodica", value: (d) => d.vendor ?? "—" },
+  { label: "Proizvođač / porodica", value: (d) => d.vendor ?? "-" },
   { label: "Tip", value: (d) => `${DISK_TYPE[d.disk_type]}${d.rotation_rate ? ` · ${d.rotation_rate} rpm` : ""}` },
   { label: "Kapacitet", value: (d) => formatCapacity(d.capacity_bytes) },
-  { label: "Firmware", value: (d) => d.firmware ?? "—" },
+  { label: "Firmware", value: (d) => d.firmware ?? "-" },
   { label: "Zdravlje", value: (d) => <HealthBadge level={d.health.level} score={d.health.score} /> },
-  { label: "SMART", value: (_, s) => (s ? SMART_HEALTH[s.smart_health].label : "—") },
+  { label: "SMART", value: (_, s) => (s ? SMART_HEALTH[s.smart_health].label : "-") },
   { label: "Temperatura", value: (_, s) => formatNumber(s?.temperature_c, " °C") },
   { label: "Sati rada", value: (_, s) => formatHours(s?.power_on_hours) },
   { label: "Uključivanja", value: (_, s) => formatNumber(s?.power_cycles) },
@@ -28,11 +28,11 @@ const ROWS: Row[] = [
   { label: "Pending sektori", value: (_, s) => formatNumber(s?.pending_sectors) },
   { label: "Neispravljivi sektori", value: (_, s) => formatNumber(s?.uncorrectable_sectors) },
   { label: "UDMA CRC greške", value: (_, s) => formatNumber(s?.crc_errors) },
-  { label: "SSD istrošenost / vek", value: (_, s) => (s?.percentage_used != null ? `${s.percentage_used}% istrošeno` : s?.ssd_life_left != null ? `${s.ssd_life_left}% preostalo` : "—") },
+  { label: "SSD istrošenost / vek", value: (_, s) => (s?.percentage_used != null ? `${s.percentage_used}% istrošeno` : s?.ssd_life_left != null ? `${s.ssd_life_left}% preostalo` : "-") },
   { label: "NVMe rezerva", value: (_, s) => formatNumber(s?.available_spare, "%") },
   { label: "NVMe media greške", value: (_, s) => formatNumber(s?.media_errors) },
-  { label: "Upisano (NVMe)", value: (_, s) => (s?.data_units_written != null ? formatDataUnits(s.data_units_written) : "—") },
-  { label: "Pool", value: (d) => d.pools.join(", ") || "—" },
+  { label: "Upisano (NVMe)", value: (_, s) => (s?.data_units_written != null ? formatDataUnits(s.data_units_written) : "-") },
+  { label: "Pool", value: (d) => d.pools.join(", ") || "-" },
 ];
 
 /** Poređenje diskova (spec. §10.6): vrednosti jedna pored druge. Raw SMART vrednosti različitih proizvođača nisu iste jedinice. */
@@ -47,7 +47,7 @@ export default function ComparePage() {
   const loaded = details.map((q) => q.data).filter(Boolean) as DiskDetail[];
   const vendors = new Set(loaded.map((d) => (d.vendor ?? d.model ?? "").split(" ")[0]));
 
-  // Zajednički SMART atributi (po ID-u) – samo informativno
+  // Zajednički SMART atributi (po ID-u) - samo informativno
   const attrIds = useMemo(() => {
     const sets = loaded.map((d) => new Set((effectiveSample(d)?.attributes ?? []).map((a) => a.id)));
     if (sets.length < 2) return [];
@@ -72,7 +72,7 @@ export default function ComparePage() {
                 setIds([...new Set(next.filter(Boolean))]);
               }}
             >
-              <option value="">{i < chosen.length ? "— ukloni —" : "+ dodaj disk"}</option>
+              <option value="">{i < chosen.length ? "- ukloni -" : "+ dodaj disk"}</option>
               {present.map((d) => (
                 <option key={d.id} value={d.id}>{d.device_name} · {d.device_path} · {d.model}</option>
               ))}
@@ -108,7 +108,7 @@ export default function ComparePage() {
                       <Td className="mono text-xs">{id} {name}</Td>
                       {loaded.map((d) => {
                         const a = effectiveSample(d)?.attributes?.find((x) => x.id === id);
-                        return <Td key={d.id} className="mono text-xs">{a ? `${a.value ?? "—"} / ${a.raw_string ?? a.raw ?? "—"}` : "—"}</Td>;
+                        return <Td key={d.id} className="mono text-xs">{a ? `${a.value ?? "-"} / ${a.raw_string ?? a.raw ?? "-"}` : "-"}</Td>;
                       })}
                     </tr>
                   );

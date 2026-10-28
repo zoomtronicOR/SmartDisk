@@ -117,7 +117,7 @@ class AlarmAction(BaseModel):
 @router.post("/alarms/{event_id}/acknowledge")
 async def acknowledge(event_id: int, body: AlarmAction, request: Request, user: User = Depends(operator_or_admin),
                       db: AsyncSession = Depends(get_db)) -> dict[str, str]:
-    """Potvrda znači „video sam”, ne „rešeno” – alarm ostaje aktivan dok uslov traje (spec. §11.3)."""
+    """Potvrda znači „video sam”, ne „rešeno” - alarm ostaje aktivan dok uslov traje (spec. §11.3)."""
     event = await db.get(Event, event_id)
     if event is None or event.status not in ("open",):
         raise HTTPException(409, "Može se potvrditi samo otvoren alarm.")
@@ -243,7 +243,7 @@ def _merge_secret(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
 
 @router.get("/thresholds")
 async def current_thresholds(_: User = Depends(current_user), db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
-    """Pragovi alarma za prikaz (merači, zone) – dostupno svim ulogama, bez podešavanja kanala."""
+    """Pragovi alarma za prikaz (merači, zone) - dostupno svim ulogama, bez podešavanja kanala."""
     return await config.thresholds(db)
 
 

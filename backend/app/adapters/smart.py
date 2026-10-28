@@ -105,7 +105,7 @@ def parse_smartctl(data: dict[str, Any], device_path: str, smart_type: str | Non
     # Disk u standby režimu (smartctl -n standby): ne budimo ga i ne tumačimo kao grešku diska.
     if exit_status & EXIT_OPEN_FAILED and any("STANDBY" in m or "SLEEP" in m for m in messages):
         r.smart_health = "standby"
-        r.smart_message = "Disk je u standby režimu – SMART nije očitan da se disk ne bi budio."
+        r.smart_message = "Disk je u standby režimu - SMART nije očitan da se disk ne bi budio."
         return r
     if exit_status & EXIT_OPEN_FAILED:
         r.smart_health = "unavailable"

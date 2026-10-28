@@ -70,17 +70,17 @@ NOTES: dict[str, list[str]] = {
     ],
     "truenas_scale": [
         "Nalog i sudo komande podešavaju se kroz web interfejs (Credentials → Users) ili middleware, "
-        "ne ručnom izmenom fajlova – TrueNAS ih prepisuje.",
+        "ne ručnom izmenom fajlova - TrueNAS ih prepisuje.",
         "U polje „Allowed sudo commands with no password” uneti komande iz spiska (svaku posebno).",
     ],
     "truenas_core": [
         "Nalog i sudo komande podešavaju se kroz middleware (midclt user.create/user.update: sudo=true, "
         "sudo_nopasswd=true, sudo_commands=[…]) ili web interfejs; ručne izmene sudoers-a TrueNAS prepisuje.",
         "Home direktorijum mora biti na pool-u (npr. /mnt/DataPool/diskmonitor) da bi SSH ključ mogao da se sačuva.",
-        "Prazan spisak komanda u TrueNAS-u znači „sve komande” – spisak nikad ne ostavljati prazan.",
+        "Prazan spisak komanda u TrueNAS-u znači „sve komande” - spisak nikad ne ostavljati prazan.",
     ],
     "synology": [
-        "Netestirano na stvarnom uređaju. DSM 7 koristi smartctl 6.x (tekstualni izlaz) – putanju proveriti sa "
+        "Netestirano na stvarnom uređaju. DSM 7 koristi smartctl 6.x (tekstualni izlaz) - putanju proveriti sa "
         "command -v smartctl.",
         "Profil sačuvati kao /etc/sudoers.d/smartdisk; DSM nadogradnja može da ga ukloni, pa ga posle nadogradnje proveriti.",
     ],
@@ -95,7 +95,7 @@ def _escape(command: str) -> str:
 def sudoers_file(platform: str, username: str = "diskmonitor") -> str:
     commands = sudo_commands(platform)
     lines = [
-        f"# SmartDisk – read-only profil za nalog {username} ({platform}).",
+        f"# SmartDisk - read-only profil za nalog {username} ({platform}).",
         "# Samo navedene komande, bez lozinke, bez opšteg sudo pristupa. Proveriti sa: visudo -cf <fajl>",
         f"Defaults:{username} !requiretty",
         "Cmnd_Alias SMARTDISK_READ = \\",

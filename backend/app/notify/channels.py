@@ -54,7 +54,7 @@ def _secret(c: dict[str, Any], name: str) -> str:
 def _post(url: str, data: bytes, headers: dict[str, str], timeout: int = 15) -> None:
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310 – URL je iz podešavanja administratora
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310 - URL je iz podešavanja administratora
             if resp.status >= 300:
                 raise ChannelError(f"Server je vratio {resp.status}.")
     except urllib.error.HTTPError as exc:

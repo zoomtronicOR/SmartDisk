@@ -16,7 +16,7 @@ Obaveštenje se šalje kada se alarm otvori, kada se pogorša (eskalacija), kao 
 | Primaoci | jedna ili više adresa, razdvojene zarezom |
 | Najniži nivo | podrazumevano „Visoko i više”, da e-pošta ne bude zatrpana |
 
-Dugme **Pošalji probnu poruku** šalje poruku sa trenutno unetim vrednostima, i pre čuvanja. Greške su opisne („server je odbio korisničko ime ili lozinku”, „server nije dostupan”, „TLS greška – proverite port”). Lozinka se čuva šifrovano i nikad se ne prikazuje.
+Dugme **Pošalji probnu poruku** šalje poruku sa trenutno unetim vrednostima, i pre čuvanja. Greške su opisne („server je odbio korisničko ime ili lozinku”, „server nije dostupan”, „TLS greška - proverite port”). Lozinka se čuva šifrovano i nikad se ne prikazuje.
 
 ## MQTT i Home Assistant
 
@@ -24,7 +24,7 @@ Preduslov je Mosquitto broker u Home Assistant-u (add-on *Mosquitto broker*) i M
 
 1. U Home Assistant-u napraviti posebnog korisnika za SmartDisk (*Settings → People → Users*, ili `logins` u konfiguraciji Mosquitto add-on-a).
 2. U SmartDisk-u, *Podešavanja → MQTT i Home Assistant*: adresa HA (npr. `192.168.88.x`), port 1883 (ili 8883 sa TLS), korisnik i lozinka. Zatim **Testiraj vezu**, pa **Sačuvaj** sa uključenim „Objavljuj stanje i alarme”.
-3. Sa uključenim *Home Assistant MQTT Discovery*, entiteti se u HA pojavljuju sami: jedan uređaj „SmartDisk” sa sažetkom i po jedan uređaj „SmartDisk – <naziv>” za svaki nadzirani sistem (temperatura, SMART, zdravlje, sati rada, NVMe istrošenost diskova; status i greške pool-ova; status uređaja). Svaka vrsta entiteta se može isključiti.
+3. Sa uključenim *Home Assistant MQTT Discovery*, entiteti se u HA pojavljuju sami: jedan uređaj „SmartDisk” sa sažetkom i po jedan uređaj „SmartDisk - <naziv>” za svaki nadzirani sistem (temperatura, SMART, zdravlje, sati rada, NVMe istrošenost diskova; status i greške pool-ova; status uređaja). Svaka vrsta entiteta se može isključiti.
 
 Teme (prefiks se podešava, podrazumevano `diskmonitor`):
 

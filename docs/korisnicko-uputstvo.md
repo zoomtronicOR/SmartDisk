@@ -1,4 +1,4 @@
-# SmartDisk – korisničko uputstvo
+# SmartDisk - korisničko uputstvo
 
 SmartDisk prati zdravlje diskova i skladišta na vašim serverima (TrueNAS, Proxmox VE, Synology) i na vreme upozorava kada nešto počne da se kvari. Uputstvo je pisano za korisnike koji nisu programeri i organizovano je po zadacima: pronađite šta želite da uradite i pratite korake.
 
@@ -8,7 +8,7 @@ Aplikacija je dostupna na adresi `https://192.168.88.246` (ili adresi koju vam j
 
 1. [Prvi koraci](#1-prvi-koraci)
 2. [Kako čitati stanje: boje, zdravlje, SMART](#2-kako-čitati-stanje)
-3. [Pregled – svakodnevna provera](#3-pregled--svakodnevna-provera)
+3. [Pregled - svakodnevna provera](#3-pregled--svakodnevna-provera)
 4. [Diskovi](#4-diskovi)
 5. [Šta da radim kada disk pokaže upozorenje](#5-šta-da-radim-kada-disk-pokaže-upozorenje)
 6. [Alarmi](#6-alarmi)
@@ -80,7 +80,7 @@ Svaki disk ima dva pokazatelja:
 
 ### „Nema grešaka” nije isto što i „nema podataka”
 
-Kada aplikacija ne može da pročita disk (uređaj je nedostupan, kontroler ne prosleđuje SMART, disk je izvađen), prikazuje se **siva oznaka „Nema podataka” / „Nepoznato”**, nikad zelena. Prazno polje ili „—” u tabeli znači „vrednost nije dostupna”, a ne 0.
+Kada aplikacija ne može da pročita disk (uređaj je nedostupan, kontroler ne prosleđuje SMART, disk je izvađen), prikazuje se **siva oznaka „Nema podataka” / „Nepoznato”**, nikad zelena. Prazno polje ili „-” u tabeli znači „vrednost nije dostupna”, a ne 0.
 
 ### Disk u standby-ju
 
@@ -88,7 +88,7 @@ Diskovi koji se uspavaju (najčešće HDD u NAS-u) dobijaju plavu oznaku **Stand
 
 ---
 
-## 3. Pregled – svakodnevna provera
+## 3. Pregled - svakodnevna provera
 
 Stranica **Pregled** je prva stranica posle prijave. Za dnevnu proveru dovoljno je pogledati:
 
@@ -124,9 +124,9 @@ Klik na model diska otvara njegovu stranicu:
 
 - **Zdravlje diska:** nivo, ocena, **razlozi** i **preporuka** šta uraditi.
 - **Disk:** model, proizvođač, serijski broj, kapacitet, tip, veza, kada je prvi put viđen.
-- **SMART – ključne vrednosti:** temperatura, radni sati, loši sektori (HDD/SSD) ili istrošenost i rezerva (NVMe). Broj veći od nule kod brojača grešaka je istaknut crveno.
+- **SMART - ključne vrednosti:** temperatura, radni sati, loši sektori (HDD/SSD) ili istrošenost i rezerva (NVMe). Broj veći od nule kod brojača grešaka je istaknut crveno.
 - **Trendovi:** koliko se svaka vrednost promenila za 24 sata, 7 dana i 30 dana. Rast brojača grešaka je istaknut crveno.
-- **Grafikoni i statistika:** izaberite period (24 sata … 1 godina ili od–do) i vrednost (temperatura, sati rada, sektori…). Ispod grafikona su minimum, maksimum, prosek i brzina promene. Trouglić ▲ na grafikonu označava trenutak kada je alarm prvi put otkriven.
+- **Grafikoni i statistika:** izaberite period (24 sata … 1 godina ili od-do) i vrednost (temperatura, sati rada, sektori…). Ispod grafikona su minimum, maksimum, prosek i brzina promene. Trouglić ▲ na grafikonu označava trenutak kada je alarm prvi put otkriven.
 - **Prognoze:** procena kada bi vrednost mogla dostići granicu (npr. istrošenost NVMe diska 100 %). Ovo je procena, ne dijagnoza; pogledajte oznaku kvaliteta.
 - **SMART atributi:** svi atributi koje disk javlja. Raw vrednosti različitih proizvođača nisu iste jedinice.
 - **SMART self-testovi:** rezultati testova iz loga diska (SmartDisk testove ne pokreće).
@@ -188,7 +188,7 @@ Potvrđivanje i zatvaranje mogu Administrator i Operater. Korisnik sa ulogom „
 
 Obaveštenja o alarmima mogu stizati na više načina. Svaki se uključuje posebno.
 
-### U pregledaču (Web Push) – svaki korisnik za sebe
+### U pregledaču (Web Push) - svaki korisnik za sebe
 
 1. Otvorite **Moj nalog** → kartica **Obaveštenja u ovom pregledaču**.
 2. Izaberite najniži nivo (npr. „Upozorenje i više”) i, po želji, samo neke uređaje.
@@ -238,7 +238,7 @@ Klik na ime pool-a otvara njegovu **istoriju**: grafikone zauzeća, slobodnog pr
 
 ### Statistika
 
-Gore se bira **period** (24 sata, 7, 30, 90 dana, 1 godina ili **Od–do** sa tačnim datumima) i **način prikaza**:
+Gore se bira **period** (24 sata, 7, 30, 90 dana, 1 godina ili **Od-do** sa tačnim datumima) i **način prikaza**:
 
 - **Grafikon**: poređenje do 8 diskova kroz vreme za izabranu vrednost. Diskovi se biraju u listi levo; svaki disk ima svoju boju i zadržava je. Pomeranje miša preko grafikona prikazuje tačne vrednosti. Krajevi donje trake služe za zumiranje. Dugme **Tabela** prikazuje iste podatke kao tabelu, a **CSV/XLSX** ih preuzima. Interval (sirovo, satno, dnevno, nedeljno) bira se pored perioda.
 - **Merači**: za svaki disk po jedan merač izabrane vrednosti (npr. temperature), sa zonama: zeleno normalno, plavo blizu praga, žuto iznad praga, crveno kritično. Pragovi su različiti za HDD, SSD i NVMe.
@@ -265,7 +265,7 @@ Ispod su **Prognoze** (procena kada će se pool napuniti ili SSD istrošiti, sa 
    - **SMART promene u periodu**: koji su brojači grešaka porasli.
    - **Stanje skladišta i greške**: pool-ovi i nizovi.
    - **Nedostupnost uređaja**: kada i koliko dugo uređaj nije bio dostupan.
-2. Izaberite period: 24 sata (dnevni), 7 dana (nedeljni), 30 dana (mesečni) ili od–do. Po potrebi izaberite i uređaj.
+2. Izaberite period: 24 sata (dnevni), 7 dana (nedeljni), 30 dana (mesečni) ili od-do. Po potrebi izaberite i uređaj.
 3. Pregled je na ekranu; dugmad **CSV**, **XLSX** i **PDF** preuzimaju izveštaj. CSV se otvara direktno u Excel-u.
 
 Administrator može podesiti da izveštaji **stižu sami e-poštom** (Podešavanja → Zakazani izveštaji): dnevno, nedeljno ili mesečno, u izabranom formatu.
@@ -301,7 +301,7 @@ Brisanje uređaja ne briše istoriju njegovih diskova.
 |---|---|
 | **Prikupljanje podataka** | koliko često se čitaju uređaji (globalni interval) i koliko dugo se čuvaju detaljna merenja (podrazumevano 365 dana; dnevni proseci ostaju i posle toga) |
 | **Opšte** | vremenska zona prikaza |
-| **Izgled – logo kompanije** | logo na dnu menija (PNG, JPEG ili WebP do 512 KB; širok logo sa providnom pozadinom izgleda najbolje) i naziv kompanije. **Ukloni logo** ga briše |
+| **Izgled - logo kompanije** | logo na dnu menija (PNG, JPEG ili WebP do 512 KB; širok logo sa providnom pozadinom izgleda najbolje) i naziv kompanije. **Ukloni logo** ga briše |
 | **Pragovi alarma** | temperature po tipu diska, dozvoljen broj novih grešaka, granice za SSD/NVMe i zauzeće, koliko neuspelih očitavanja znači „nedostupan”, ponovno obaveštavanje. **Vrati preporučene** vraća podrazumevane vrednosti |
 | **E-pošta (SMTP)**, **MQTT i Home Assistant**, **Dodatni kanali** | kanali obaveštenja, svaki sa probom |
 | **Opšte za obaveštenja** | adresa aplikacije za linkove u porukama, obaveštenje kada se alarm reši |

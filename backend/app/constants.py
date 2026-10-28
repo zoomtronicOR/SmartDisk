@@ -11,7 +11,7 @@ ROLES: dict[str, str] = {
     "viewer": "Pregled",
 }
 
-# Granice intervala prikupljanja u minutima (1 minut – 7 dana).
+# Granice intervala prikupljanja u minutima (1 minut - 7 dana).
 INTERVAL_MIN_MINUTES = 1
 INTERVAL_MAX_MINUTES = 7 * 24 * 60
 

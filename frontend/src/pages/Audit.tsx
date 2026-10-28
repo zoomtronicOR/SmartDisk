@@ -91,7 +91,7 @@ const CLIENT_LABELS: Record<string, string> = {
 const RESULT_TONE: Record<string, "ok" | "critical" | "warning"> = { "uspešno": "ok", "neuspešno": "critical", "odbijeno": "warning" };
 
 function value(v: unknown): string {
-  if (v === null || v === undefined || v === "") return "—";
+  if (v === null || v === undefined || v === "") return "-";
   if (typeof v === "boolean") return v ? "da" : "ne";
   if (typeof v === "object") return JSON.stringify(v);
   return String(v);
@@ -122,12 +122,12 @@ function AuditDetail({ entry, onClose }: { entry: AuditEntry; onClose: () => voi
         <Rows
           rows={[
             ["Vreme", formatDateTime(entry.created_at)],
-            ["Korisnik", entry.username ?? (d.username as string) ?? "—"],
+            ["Korisnik", entry.username ?? (d.username as string) ?? "-"],
             ["Radnja", <code key="a" className="text-xs">{entry.action}</code>],
             ...(result ? [["Rezultat", <Badge key="r" tone={RESULT_TONE[result] ?? "unknown"}>{result}</Badge>] as [string, ReactNode]] : []),
             ...(d.reason ? [["Razlog", value(d.reason)] as [string, ReactNode]] : []),
-            ["Objekat", entry.entity_type ? `${entry.entity_type} #${entry.entity_id}` : "—"],
-            ["IP adresa", entry.source_ip ?? "—"],
+            ["Objekat", entry.entity_type ? `${entry.entity_type} #${entry.entity_id}` : "-"],
+            ["IP adresa", entry.source_ip ?? "-"],
           ]}
         />
         {device && (
@@ -143,7 +143,7 @@ function AuditDetail({ entry, onClose }: { entry: AuditEntry; onClose: () => voi
                 ["Vrsta uređaja", value(device.device)],
                 ...(device.proxy ? [["Prosleđeno preko (X-Forwarded-For)", device.proxy] as [string, ReactNode]] : []),
                 ...Object.entries(device.client ?? {}).map(([k, v]) => [CLIENT_LABELS[k] ?? k, value(v)] as [string, ReactNode]),
-                ["User-Agent", <code key="ua" className="break-all text-xs">{device.user_agent || "—"}</code>],
+                ["User-Agent", <code key="ua" className="break-all text-xs">{device.user_agent || "-"}</code>],
               ]}
             />
             <p className="text-xs text-slate-500">
@@ -232,20 +232,20 @@ export default function AuditPage() {
                   aria-label={`Detalji: ${ACTION_LABELS[e.action] ?? e.action}`}
                 >
                   <Td className="whitespace-nowrap">{formatDateTime(e.created_at)}</Td>
-                  <Td>{e.username ?? ((e.details as Record<string, unknown> | null)?.username as string) ?? "—"}</Td>
+                  <Td>{e.username ?? ((e.details as Record<string, unknown> | null)?.username as string) ?? "-"}</Td>
                   <Td>
                     {ACTION_LABELS[e.action] ?? e.action}
                     <code className="block text-xs text-slate-400">{e.action}</code>
                   </Td>
-                  <Td>{e.entity_type ? `${e.entity_type} #${e.entity_id}` : "—"}</Td>
-                  <Td className="mono text-xs">{e.source_ip ?? "—"}</Td>
+                  <Td>{e.entity_type ? `${e.entity_type} #${e.entity_id}` : "-"}</Td>
+                  <Td className="mono text-xs">{e.source_ip ?? "-"}</Td>
                   <Td className="max-w-md text-xs">{shortDetails(e)}</Td>
                 </tr>
               ))}
             </Table>
             <div className="mt-3 flex items-center justify-between text-sm text-slate-500">
               <span>
-                {query.data!.total === 0 ? "Nema zapisa" : `${offset + 1}–${Math.min(offset + PAGE, query.data!.total)} od ${query.data!.total}`}
+                {query.data!.total === 0 ? "Nema zapisa" : `${offset + 1}-${Math.min(offset + PAGE, query.data!.total)} od ${query.data!.total}`}
                 {" · klik na red prikazuje sve detalje"}
               </span>
               <div className="flex gap-2">

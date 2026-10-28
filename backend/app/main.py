@@ -65,7 +65,7 @@ async def validation_error(_: Request, exc: RequestValidationError) -> JSONRespo
         else:
             message = _VALIDATION_MESSAGES.get(str(err.get("type")), message)
         parts.append(f"{field}: {message}" if field else message)
-    return JSONResponse(status_code=422, content={"detail": "Neispravan unos – " + "; ".join(parts)})
+    return JSONResponse(status_code=422, content={"detail": "Neispravan unos - " + "; ".join(parts)})
 
 
 app.include_router(auth.router)

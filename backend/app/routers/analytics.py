@@ -122,7 +122,7 @@ async def _series_response(db: AsyncSession, kind: str, ids_raw: str, metric_nam
              export.Column("value", "Vrednost", "float"), export.Column("min", "Min", "float"),
              export.Column("max", "Maks", "float"), export.Column("n", "Očitavanja", "int")],
             rows,
-            f"Period: {start.strftime('%d.%m.%Y. %H:%M')} – {end.strftime('%d.%m.%Y. %H:%M')} · interval: {bucket_label}",
+            f"Period: {start.strftime('%d.%m.%Y. %H:%M')} - {end.strftime('%d.%m.%Y. %H:%M')} · interval: {bucket_label}",
         )
         return _download(export.render(report, fmt, tz, user.username), fmt, f"smartdisk-{metric_name}-{start:%Y%m%d}-{end:%Y%m%d}")
 

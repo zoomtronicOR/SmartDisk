@@ -28,7 +28,7 @@ _POOL_FIELDS = ("status", "healthy", "redundancy", "capacity_bytes", "used_bytes
 _POOL_SAMPLE_FIELDS = ("status", "healthy", "read_errors", "write_errors", "checksum_errors", "capacity_bytes",
                        "used_bytes", "free_bytes", "scan_type", "scan_state", "scan_progress", "scan_errors")
 
-# Postgres BIGINT; neki brojači (npr. spakovani raw) mogu biti veći – tada se ne čuvaju.
+# Postgres BIGINT; neki brojači (npr. spakovani raw) mogu biti veći - tada se ne čuvaju.
 _MAX_BIGINT = 2**63 - 1
 _MAX_INT = 2**31 - 1
 
@@ -52,7 +52,7 @@ async def save_disks(db: AsyncSession, device_id: int, run_id: int, result: Coll
     disks = list(await db.scalars(select(Disk).where(Disk.device_id == device_id).order_by(Disk.last_seen_at)))
     existing = {d.stable_identifier: d for d in disks}
     # Disk u standby-ju (ili bez SMART-a) ne vraća WWN ni serijski broj. Tada je to poznati disk na istoj putanji,
-    # a ne nov disk – inače bi se pravi disk pogrešno označio kao nestao.
+    # a ne nov disk - inače bi se pravi disk pogrešno označio kao nestao.
     by_path = {d.device_path: d for d in disks if not d.stable_identifier.startswith("path-")}
     by_key: dict[str, int] = {}
     seen: set[str] = set()
@@ -63,7 +63,7 @@ async def save_disks(db: AsyncSession, device_id: int, run_id: int, result: Coll
         ident = _identifier(reading)
         if reading.stable_identifier is None and reading.device_path in by_path:
             ident = by_path[reading.device_path].stable_identifier
-        if ident in seen:  # isti disk vidljiv kroz dve putanje (npr. multipath) – čuva se jednom
+        if ident in seen:  # isti disk vidljiv kroz dve putanje (npr. multipath) - čuva se jednom
             continue
         seen.add(ident)
         disk = existing.get(ident)

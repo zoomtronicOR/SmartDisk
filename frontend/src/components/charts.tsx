@@ -13,7 +13,7 @@ const colorOf = (s: Series, i: number) => s.color ?? SERIES_COLORS[i];
 
 /** Formatira vrednost metrike po jedinici (bajtovi, procenti, sati…). */
 export function formatMetric(value: number | null | undefined, unit: string): string {
-  if (value == null || Number.isNaN(value)) return "—";
+  if (value == null || Number.isNaN(value)) return "-";
   if (unit === "B") return formatBytes(value);
   const rounded = Math.abs(value) >= 100 ? Math.round(value) : Math.round(value * 10) / 10;
   return formatNumber(rounded, unit ? (unit === "%" ? "%" : ` ${unit}`) : "");
@@ -90,7 +90,7 @@ export function TimeChart({
         const row = map.get(ts) ?? ({ ts } as Row);
         row[`s${s.id}`] = p.value;
         if (p.n > 1 && p.min != null && p.max != null && p.min !== p.max) {
-          (row as Record<string, unknown>)[`r${s.id}`] = `${formatMetric(p.min, unit)} – ${formatMetric(p.max, unit)}`;
+          (row as Record<string, unknown>)[`r${s.id}`] = `${formatMetric(p.min, unit)} - ${formatMetric(p.max, unit)}`;
         }
         map.set(ts, row);
       }
@@ -203,7 +203,7 @@ export function TimeChart({
           {markers.length > 0 && (
             <ul className="text-xs text-slate-500" aria-label="Oznake na grafikonu">
               {markers.map((m) => (
-                <li key={`${m.ts}-${m.label}`}>▲ {formatDateTime(new Date(m.ts).toISOString())} – {m.label}</li>
+                <li key={`${m.ts}-${m.label}`}>▲ {formatDateTime(new Date(m.ts).toISOString())} - {m.label}</li>
               ))}
             </ul>
           )}
@@ -272,7 +272,7 @@ export function PeriodPicker({ value, onChange, showBucket = true }: { value: Pe
           onClick={() => setCustom(true)}
           className={`rounded-md px-2.5 py-1 text-sm ${custom ? "bg-brand-700 font-medium text-white" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"}`}
         >
-          Od–do
+          Od-do
         </button>
       </div>
       {custom && (

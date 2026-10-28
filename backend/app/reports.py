@@ -66,7 +66,7 @@ async def _disk_rows(db: AsyncSession, device_id: int | None = None) -> list[tup
 
 
 async def build(db: AsyncSession, kind: str, start: datetime, end: datetime, device_id: int | None = None) -> Report:
-    period = f"Period: {start.strftime('%d.%m.%Y. %H:%M')} – {end.strftime('%d.%m.%Y. %H:%M')}"
+    period = f"Period: {start.strftime('%d.%m.%Y. %H:%M')} - {end.strftime('%d.%m.%Y. %H:%M')}"
     if kind == "devices":
         return await _report_devices(db, start, end, period)
     if kind == "disks":
@@ -243,14 +243,14 @@ async def _report_availability(db: AsyncSession, start: datetime, end: datetime,
                 "ongoing": outage["end"] is None, "reason": outage["reason"],
             })
     totals = "; ".join(
-        f"{d.name}: dostupnost {avail['totals'][d.id]['availability_percent'] if avail['totals'][d.id]['availability_percent'] is not None else '—'}%"
+        f"{d.name}: dostupnost {avail['totals'][d.id]['availability_percent'] if avail['totals'][d.id]['availability_percent'] is not None else '-'}%"
         f", {avail['totals'][d.id]['outages']} nedostupnosti" for d in devices
     )
     return Report(REPORT_KINDS["availability"], [
         Column("device", "Uređaj"), Column("start", "Početak", "datetime"), Column("end", "Kraj", "datetime"),
         Column("hours", "Trajanje (h)", "float"), Column("failed_runs", "Neuspelih ciklusa", "int"),
         Column("ongoing", "I dalje traje"), Column("reason", "Razlog"),
-    ], rows, period, [f"Ukupno – {totals}.", "Nedostupnost traje od prvog neuspelog do prvog sledećeg uspešnog ciklusa."])
+    ], rows, period, [f"Ukupno - {totals}.", "Nedostupnost traje od prvog neuspelog do prvog sledećeg uspešnog ciklusa."])
 
 
 HEALTH_LABEL = {"excellent": "Odlično", "good": "Dobro", "attention": "Pažnja", "endangered": "Ugroženo",

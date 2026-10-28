@@ -73,7 +73,7 @@ export default function DeviceForm({ device, onClose, onSaved }: Props) {
   const timezones = typeof Intl.supportedValuesOf === "function" ? Intl.supportedValuesOf("timeZone") : ["Europe/Belgrade", "UTC"];
 
   return (
-    <Modal title={device ? `Izmena uređaja – ${device.name}` : "Novi uređaj"} onClose={onClose} wide>
+    <Modal title={device ? `Izmena uređaja - ${device.name}` : "Novi uređaj"} onClose={onClose} wide>
       <form onSubmit={submit} className="space-y-3">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Naziv">

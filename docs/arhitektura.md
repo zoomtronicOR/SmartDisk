@@ -55,7 +55,7 @@ FastAPI proces
 Odstupanja od predloga u spec. §9.1:
 
 - SMART atributi su JSONB kolona u `disk_samples`, a ne posebna tabela `smart_attributes`. Jedno očitavanje sa ~25 atributa je jedan red umesto 25, a upiti po atributu i dalje rade preko JSONB operatora.
-- Kompletan izlaz `smartctl` (`raw_payload`) čuva se samo za poslednje očitavanje (`disks.last_raw`), ne u svakom uzorku. Jedan izlaz ima 10–20 KB, pa bi ga godišnja istorija umnožila na više GB.
+- Kompletan izlaz `smartctl` (`raw_payload`) čuva se samo za poslednje očitavanje (`disks.last_raw`), ne u svakom uzorku. Jedan izlaz ima 10-20 KB, pa bi ga godišnja istorija umnožila na više GB.
 - `NULL` u uzorku znači „nije dostupno”, nikad 0 ili „ispravno”.
 
 Sva vremena se čuvaju kao `timestamptz` u UTC-u. Frontend ih prikazuje u vremenskoj zoni iz podešavanja (podrazumevano `Europe/Belgrade`).
@@ -63,9 +63,9 @@ Sva vremena se čuvaju kao `timestamptz` u UTC-u. Frontend ih prikazuje u vremen
 ## Prikupljanje i scheduler
 
 - Svaki uključen uređaj sa potvrđenim host ključem i SSH ključem ima posao `collect:<id>` u scheduler-u.
-- Interval je sopstveni interval uređaja ili globalni podrazumevani (1 minut – 7 dana).
+- Interval je sopstveni interval uređaja ili globalni podrazumevani (1 minut - 7 dana).
 - **Promena intervala važi odmah:** API posle izmene uređaja ili globalnog intervala usklađuje poslove (`scheduler.sync_device` / `sync_all`). Sledeći ciklus je „sada + novi interval”, a UI prikazuje vreme sledećeg prikupljanja.
-- Posle restarta servisa prvi ciklusi se raspoređuju nasumično u narednih 5–60 s, da se uređaji ne kontaktiraju istovremeno.
+- Posle restarta servisa prvi ciklusi se raspoređuju nasumično u narednih 5-60 s, da se uređaji ne kontaktiraju istovremeno.
 - Poslovi imaju `max_instances=1` i `coalesce`. Collector dodatno sprečava preklapanje ciklusa istog uređaja, a broj paralelnih SSH sesija ograničava semaforom (`SMARTDISK_MAX_PARALLEL_SSH`).
 - Ciklus ne drži otvorenu konekciju ka bazi dok čeka SSH.
 - Ako uređaj više ne postoji ili je isključen van API-ja, njegov posao se uklanja posle sledećeg pokušaja.
@@ -246,7 +246,7 @@ Greške se vraćaju kao `{"detail": "<poruka na srpskom>"}`. I greške validacij
 - Serijski brojevi su podrazumevano maskirani i otkrivaju se klikom (spec. §6.2, §9.2).
 - Faza 3: Statistika (poređenje do 8 diskova na jednom grafikonu, tabela statistike, temperature, radni sati, istrošenost, trend zauzeća pool-ova sa procenom „puno za”, dostupnost uređaja), Izveštaji (pregled i preuzimanje CSV/XLSX/PDF; dnevni, nedeljni i mesečni period), detalj pool-a sa istorijom, dostupnost na stranici uređaja, trendovi i grafikoni na stranici diska. Tabela diskova ima sortiranje, filtere (uređaj, stanje, SMART, tip, prisutnost, tekst), straničenje i izvoz.
 - Grafikoni (`components/charts.tsx`, Recharts): linije od 2 px, tooltip sa svim serijama za isti trenutak, legenda za 2+ serije, zumiranje prevlačenjem donje trake, prikaz kao tabela i izvoz podataka. Paleta serija je proverena za razlikovanje kod daltonizma u obe teme (`index.css`, `--series-1…8`). Boje se dodeljuju redom, nikad ciklično. Grafikoni nikad nemaju dve y-ose.
-- Izbor perioda: 24 sata, 7, 30 i 90 dana, 1 godina i proizvoljno od–do, uz interval agregacije (automatski, sirovo, satno, dnevno, nedeljno).
+- Izbor perioda: 24 sata, 7, 30 i 90 dana, 1 godina i proizvoljno od-do, uz interval agregacije (automatski, sirovo, satno, dnevno, nedeljno).
 - Stranice sa grafikonima se učitavaju tek kada zatrebaju (Recharts je zaseban paket).
 - Faza 4: Alarmi (brojači po nivou, filteri, potvrda, ručno zatvaranje, detalj sa istorijom, komentarima i poslatim obaveštenjima), značka sa brojem aktivnih alarma u meniju, „Zdravlje diska” (kartica sa razlozima i preporukama po spec. §8.12, kolona u tabeli diskova, brojači na pregledu), oznake trenutka alarma na grafikonima diska, Podešavanja (pragovi, SMTP, MQTT/HA, adresa aplikacije, evidencija obaveštenja), Web Push u „Moj nalog”.
 - Pool bez redundanse (ZFS stripe) dobija upozorenje. Zauzeće LVM volume grupe se prikazuje neutralno, kao „dodeljeno volumenima”, jer je visok procenat na Proxmoxu uobičajen.

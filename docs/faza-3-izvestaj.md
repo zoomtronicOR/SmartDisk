@@ -1,4 +1,4 @@
-# Izveštaj – Faza 3: Dashboard i analitika
+# Izveštaj - Faza 3: Dashboard i analitika
 
 **Datum:** 28.10.2026.
 **Verzija:** 0.3.0 + migracija `0003` (aplikacija je tada greškom još prikazivala 0.1.0)
@@ -12,7 +12,7 @@
 | Tabele diskova i uređaja | ✓ diskovi: sortiranje po kolonama, filteri (uređaj, stanje, SMART, tip, prisutnost, tekst), straničenje, izvoz CSV/XLSX/PDF; uređaji: broj diskova i upozorenja | `pages/Disks.tsx`, `pages/Devices.tsx` |
 | Detaljna stranica diska | ✓ trendovi 24 h / 7 dana / 30 dana, grafikoni po metrici, statistika za period | `components/DiskAnalytics.tsx` |
 | Grafikoni i statistika | ✓ poređenje do 8 diskova na jednom grafikonu; temperature (min/prosek/maks), radni sati, istrošenost SSD/NVMe, trend zauzeća pool-ova sa procenom „puno za”, dostupnost uređaja | `pages/Statistics.tsx`, `/api/metrics/*`, `/api/stats/overview` |
-| Period od–do | ✓ 24 sata, 7, 30, 90 dana, 1 godina, proizvoljno od–do; interval: automatski, sirovo, satno, dnevno, nedeljno | `components/charts.tsx: PeriodPicker` |
+| Period od-do | ✓ 24 sata, 7, 30, 90 dana, 1 godina, proizvoljno od-do; interval: automatski, sirovo, satno, dnevno, nedeljno | `components/charts.tsx: PeriodPicker` |
 | Izvoz izveštaja | ✓ CSV, XLSX, PDF za 6 izveštaja i za podatke svakog grafikona | `export.py`, `reports.py`, `pages/Reports.tsx` |
 | Dnevni agregati (spec. §9.2) | ✓ `disk_daily`, `pool_daily`, noćni obračun u 03:15; ostaju posle brisanja sirovih merenja | `analytics.aggregate_daily` |
 | Detalj pool-a | ✓ istorija zauzeća, slobodnog prostora, R/W/CKSUM grešaka i napretka scrub-a/resilver-a | `pages/PoolDetail.tsx` |
@@ -25,7 +25,7 @@ Grafikoni prate pravila za čitljivost i pristupačnost:
 - paleta serija je proverena validatorom za daltonizam (protan/deutan/tritan) u svetloj i tamnoj temi;
 - boja prati disk, a ne redosled: kada se disk ukloni sa poređenja, ostali zadržavaju svoje boje;
 - grafikon nema dve y-ose, a za 2+ serije ima legendu;
-- tooltip prikazuje sve serije za isti trenutak, uz raspon (min–maks) agregiranog intervala;
+- tooltip prikazuje sve serije za isti trenutak, uz raspon (min-maks) agregiranog intervala;
 - zumiranje prevlačenjem donje trake;
 - prikaz kao tabela, jer tri svetle boje imaju kontrast ispod 3:1 na beloj pozadini.
 

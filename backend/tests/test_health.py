@@ -30,7 +30,7 @@ def sample(**kw):
 
 
 def hist(**kw):
-    """kw: reallocated_sectors=(d1, d7, d30) – vrednosti na početku prozora; prev_<col>=…; temps=[…]."""
+    """kw: reallocated_sectors=(d1, d7, d30) - vrednosti na početku prozora; prev_<col>=…; temps=[…]."""
     h = {}
     for key, value in kw.items():
         if key == "temps":
@@ -138,7 +138,7 @@ def test_no_data_is_unknown_never_ok():
     conds, h = run(s, hist(recent=[False, False, False, True]))
     assert h.level == "unknown" and h.score is None
     assert by_rule(conds)["no_data"].severity == "warning"
-    conds, h = run(s, hist(recent=[False, True]))  # samo jedan ciklus bez podataka – još bez alarma
+    conds, h = run(s, hist(recent=[False, True]))  # samo jedan ciklus bez podataka - još bez alarma
     assert "no_data" not in by_rule(conds) and h.level == "unknown"
 
 
@@ -183,7 +183,7 @@ def test_pool_usage_scrub_and_errors():
     assert conds["pool_errors"].severity == "warning"
     assert conds["scrub_errors"].severity == "high"
     assert evaluate_pool(DEVICE, pool(), TH, set()) == []
-    # LVM volume grupa je uvek skoro puna (thin pool) – nije alarm
+    # LVM volume grupa je uvek skoro puna (thin pool) - nije alarm
     assert evaluate_pool(DEVICE, pool(technology="lvm_vg", used_bytes=99), TH, set()) == []
 
 

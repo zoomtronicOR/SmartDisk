@@ -1,4 +1,4 @@
-# Izveštaj – Faza 5: Napredne funkcije
+# Izveštaj - Faza 5: Napredne funkcije
 
 **Datum:** 28.10.2026.
 **Verzija:** 0.5.0 + migracija `0005` (korisničko uputstvo: 0.6.0)
@@ -28,7 +28,7 @@
 
 | Provera | Rezultat |
 |---|---|
-| NTP | `pool.ntp.org`, odstupanje 0,4 ms, stratum 2–3, host sinhronizovan; sat u zaglavlju |
+| NTP | `pool.ntp.org`, odstupanje 0,4 ms, stratum 2-3, host sinhronizovan; sat u zaglavlju |
 | Prognoze | 15 procena za diskove i 13 za pool-ove, sve označene „nepouzdano” (istorija je kraća od dana), što je ispravno |
 | Merači | 13 diskova; zone po tipu (Kingston NVMe na 49 °C je „normalno”, jer NVMe ima više pragove); standby diskovi prikazuju poslednje očitavanje |
 | Mapa skladišta | DataPool raidz2 sa 7 diskova, MediaPool, boot-pool; Proxmox thin pool i diskovi van pool-a |

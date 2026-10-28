@@ -132,7 +132,7 @@ function ThresholdsCard({ initial, defaults }: { initial: Thresholds; defaults: 
             visoko <Num value={th.percentage_used.high} onChange={(v) => set(["percentage_used", "high"], v)} max={100} />
             kritično <Num value={th.percentage_used.critical} onChange={(v) => set(["percentage_used", "critical"], v)} max={100} />
           </Row>
-          <Row label="NVMe rezerva – minimum (%)" hint="koristi se veći od ovog i praga koji prijavljuje disk">
+          <Row label="NVMe rezerva - minimum (%)" hint="koristi se veći od ovog i praga koji prijavljuje disk">
             <Num value={n("available_spare_min")} onChange={(v) => set(["available_spare_min"], v)} max={100} />
           </Row>
           <Row label="Preostali vek SSD-a (%)">
@@ -293,7 +293,7 @@ function MqttCard({ initial, allEntities }: { initial: MqttSettings; allEntities
         )}
         <p className="text-xs text-slate-500">
           Teme: <code>{f.prefix}/availability</code>, <code>{f.prefix}/summary</code>, <code>{f.prefix}/devices/&lt;id&gt;/state</code>, <code>{f.prefix}/disks/&lt;id&gt;/state</code>,{" "}
-          <code>{f.prefix}/pools/&lt;id&gt;/state</code>, <code>{f.prefix}/events</code>. Samo telemetrija – komande se ne primaju; serijski brojevi se ne objavljuju.
+          <code>{f.prefix}/pools/&lt;id&gt;/state</code>, <code>{f.prefix}/events</code>. Samo telemetrija - komande se ne primaju; serijski brojevi se ne objavljuju.
         </p>
         {feedback("mqtt")}
         {feedback("mqtt-test")}

@@ -32,7 +32,7 @@ async def vapid_keys(db: AsyncSession) -> dict[str, str]:
 
 
 class PushGone(Exception):
-    """Pretplata više ne postoji (pregledač je povukao dozvolu) – briše se."""
+    """Pretplata više ne postoji (pregledač je povukao dozvolu) - briše se."""
 
 
 def _send_sync(sub: dict[str, Any], payload: dict[str, Any], private_pem: str, subject: str) -> None:

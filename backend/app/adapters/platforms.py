@@ -92,7 +92,7 @@ async def _smartctl_json_ok(ctx: Context) -> bool:
 async def collect_disks(ctx: Context, json_mode: bool = True) -> list[DiskReading]:
     smartctl = ctx.tool("smartctl")
     if not smartctl:
-        ctx.result.errors.append("smartctl nije pronađen – SMART podaci nisu dostupni.")
+        ctx.result.errors.append("smartctl nije pronađen - SMART podaci nisu dostupni.")
         return []
     scan_cmd = f"{smartctl} -j --scan-open" if json_mode else f"{smartctl} --scan-open"
     out = await ctx.call(ctx.privileged(scan_cmd), "Pretraga diskova (smartctl --scan-open)")

@@ -38,13 +38,13 @@ const QUALITY = {
 } as const;
 
 function eta(days: number | null): string {
-  if (days == null) return "—";
+  if (days == null) return "-";
   if (days > 3650) return "više od 10 godina";
   if (days > 365) return `~${(days / 365).toLocaleString("sr-Latn", { maximumFractionDigits: 1 })} god.`;
   return `~${Math.round(days)} dana`;
 }
 
-/** Procene trenda (spec. §16.1) – uvek označene kao procene, sa kvalitetom podataka. */
+/** Procene trenda (spec. §16.1) - uvek označene kao procene, sa kvalitetom podataka. */
 export default function PredictionsCard({ diskId }: { diskId?: number }) {
   const q = useQuery({ queryKey: ["predictions"], queryFn: () => api<Response>("/predictions?days=90", { background: true }), refetchInterval: 600_000 });
   if (q.isLoading) return <Spinner />;
@@ -64,7 +64,7 @@ export default function PredictionsCard({ diskId }: { diskId?: number }) {
                 <Td>{d.label}</Td>
                 <Td>{formatMetric(d.last, d.unit)}</Td>
                 <Td className="whitespace-nowrap">{d.slope_per_30d > 0 ? "+" : ""}{formatMetric(d.slope_per_30d, d.unit)}</Td>
-                <Td>{d.limit != null ? formatMetric(d.limit, d.unit) : "—"}</Td>
+                <Td>{d.limit != null ? formatMetric(d.limit, d.unit) : "-"}</Td>
                 <Td>{eta(d.days_to_limit)}</Td>
                 <Td><span title={d.quality_note}><Badge tone={QUALITY[d.quality].tone}>{QUALITY[d.quality].label}</Badge></span></Td>
               </tr>

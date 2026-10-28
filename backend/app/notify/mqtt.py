@@ -143,7 +143,7 @@ def discovery(cfg: dict[str, Any], entities: dict[str, Any]) -> dict[str, str]:
             "device": app_device, **extra,
         })
     for dev in entities["devices"]:
-        ha_dev = {"identifiers": [f"smartdisk_device_{dev['id']}"], "name": f"SmartDisk – {dev['name']}",
+        ha_dev = {"identifiers": [f"smartdisk_device_{dev['id']}"], "name": f"SmartDisk - {dev['name']}",
                   "manufacturer": "SmartDisk", "model": dev["platform"], "via_device": "smartdisk"}
         entity("device_status", "sensor", f"smartdisk_device_{dev['id']}_status", {
             "name": "Status uređaja", "state_topic": f"{prefix}/devices/{dev['id']}/state",
@@ -152,7 +152,7 @@ def discovery(cfg: dict[str, Any], entities: dict[str, Any]) -> dict[str, str]:
         })
     dev_names = {d["id"]: d["name"] for d in entities["devices"]}
     for disk in entities["disks"]:
-        ha_dev = {"identifiers": [f"smartdisk_device_{disk['device_id']}"], "name": f"SmartDisk – {dev_names.get(disk['device_id'])}"}
+        ha_dev = {"identifiers": [f"smartdisk_device_{disk['device_id']}"], "name": f"SmartDisk - {dev_names.get(disk['device_id'])}"}
         base = f"{prefix}/disks/{disk['id']}/state"
         label = f"{disk['path']} {disk.get('model') or ''}".strip()
         uid = f"smartdisk_disk_{disk['id']}"
@@ -180,7 +180,7 @@ def discovery(cfg: dict[str, Any], entities: dict[str, Any]) -> dict[str, str]:
     for pool in entities["pools"]:
         if pool["technology"] not in ("zfs", "mdadm", "lvm_thin", "synology_volume"):
             continue
-        ha_dev = {"identifiers": [f"smartdisk_device_{pool['device_id']}"], "name": f"SmartDisk – {dev_names.get(pool['device_id'])}"}
+        ha_dev = {"identifiers": [f"smartdisk_device_{pool['device_id']}"], "name": f"SmartDisk - {dev_names.get(pool['device_id'])}"}
         base = f"{prefix}/pools/{pool['id']}/state"
         uid = f"smartdisk_pool_{pool['id']}"
         entity("pool_status", "sensor", f"{uid}_status", {
@@ -210,7 +210,7 @@ def publish_event(payload: dict[str, Any]) -> None:
         try:
             state.queue.put_nowait(("event", payload))
         except asyncio.QueueFull:
-            log.warning("MQTT red je pun – događaj nije objavljen")
+            log.warning("MQTT red je pun - događaj nije objavljen")
 
 
 def _tls(cfg: dict[str, Any]) -> ssl.SSLContext | None:
@@ -277,7 +277,7 @@ async def _run(cfg: dict[str, Any]) -> None:
         except Exception as exc:  # broker nedostupan, odbijena prijava…
             state.connected = False
             state.last_error = _error_text(exc)
-            log.warning("MQTT: %s – novi pokušaj za %s s", state.last_error, delay)
+            log.warning("MQTT: %s - novi pokušaj za %s s", state.last_error, delay)
             await asyncio.sleep(delay)
             delay = min(delay * 2, 300)
 

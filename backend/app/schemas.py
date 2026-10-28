@@ -84,7 +84,7 @@ class UserCreate(BaseModel):
     def check_username(cls, value: str) -> str:
         value = value.strip().lower()
         if not _USERNAME_RE.match(value):
-            raise ValueError("Korisničko ime: 2–64 znaka, mala slova, cifre, tačka, crtica ili donja crta.")
+            raise ValueError("Korisničko ime: 2-64 znaka, mala slova, cifre, tačka, crtica ili donja crta.")
         return value
 
 

@@ -85,7 +85,7 @@ const toneStyles: Record<Tone, { cls: string; Icon: typeof Info }> = {
   info: { cls: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300", Icon: Info },
 };
 
-/** Status se uvek prikazuje bojom, ikonom i tekstom – boja nikad nije jedini nosilac informacije. */
+/** Status se uvek prikazuje bojom, ikonom i tekstom - boja nikad nije jedini nosilac informacije. */
 export function Badge({ tone, children }: { tone: Tone; children: ReactNode }) {
   const { cls, Icon } = toneStyles[tone];
   return (

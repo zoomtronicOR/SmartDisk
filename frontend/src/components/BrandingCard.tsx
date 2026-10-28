@@ -56,7 +56,7 @@ export default function BrandingCard() {
 
   const current = branding.data?.has_logo ? `/api/branding/logo?v=${branding.data.version}` : null;
   return (
-    <Card title="Izgled – logo kompanije">
+    <Card title="Izgled - logo kompanije">
       <div className="max-w-2xl space-y-3 text-sm">
         <p className="text-slate-500">Logo se prikazuje na dnu menija, ispod oznake verzije. Preporuka: širok logo (npr. 400×120 px) sa providnom pozadinom, PNG, JPEG ili WebP do 512 KB.</p>
         <div className="flex flex-wrap items-center gap-4">
