@@ -1,17 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Angry, BellRing, ChartLine, CircleHelp, Columns3, Database, Network, FileText, HardDrive, LayoutDashboard, LogOut, Menu, Moon, ScrollText, Server, Settings, Sun, UserCircle, Users } from "lucide-react";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { ROLE_LABELS, setDisplayTimezone } from "../format";
 import type { AlarmSummary, SystemStatus } from "../types";
 import { useBranding } from "./BrandingCard";
+import { useClickBurst } from "./clickBurst";
 import Clock from "./Clock";
 import { Alert, Spinner } from "./ui";
 
-const ANGRY_CLICKS = 5;
-const ANGRY_GAP_MS = 1500;
 const ANGRY_MS = 5 * 60_000;
 
 /** Naslov u sidebaru. Skrivena šala: 5 uzastopnih klikova prikazuje ljutog smajlija na 5 minuta. */
@@ -23,7 +22,6 @@ function AppTitle() {
       return 0;
     }
   });
-  const clicks = useRef({ count: 0, last: 0 });
   const angry = until > Date.now();
 
   useEffect(() => {
@@ -32,21 +30,15 @@ function AppTitle() {
     return () => clearTimeout(t);
   }, [angry, until]);
 
-  const onClick = () => {
-    const now = Date.now();
-    const c = clicks.current;
-    c.count = now - c.last <= ANGRY_GAP_MS ? c.count + 1 : 1;
-    c.last = now;
-    if (c.count < ANGRY_CLICKS) return;
-    c.count = 0;
-    const next = now + ANGRY_MS;
+  const onClick = useClickBurst(() => {
+    const next = Date.now() + ANGRY_MS;
     setUntil(next);
     try {
       localStorage.setItem("sd-angry", String(next));
     } catch {
       // bez localStorage smajli traje samo dok je stranica otvorena
     }
-  };
+  });
 
   return (
     <span className="flex select-none items-center gap-1.5 text-lg font-semibold" onClick={onClick}>

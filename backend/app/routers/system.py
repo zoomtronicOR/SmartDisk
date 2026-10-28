@@ -205,8 +205,9 @@ async def system_time(_: User = Depends(current_user), db: AsyncSession = Depend
     """Vreme servera i stanje NTP sinhronizacije (spec. §18.1). Klijent iz server_time računa svoje odstupanje."""
     from .. import timesync
 
-    return {"server_time": datetime.now(UTC), "timezone": await settings_store.get_setting(db, settings_store.TIMEZONE),
-            "ntp_server": await settings_store.get_setting(db, settings_store.NTP_SERVER), **timesync.status()}
+    # status() posle restarta ima ntp_server=None dok ne prođe prva provera, pa podešeni server ide posle njega
+    return {**timesync.status(), "server_time": datetime.now(UTC), "timezone": await settings_store.get_setting(db, settings_store.TIMEZONE),
+            "ntp_server": await settings_store.get_setting(db, settings_store.NTP_SERVER)}
 
 
 class TimeSettingsIn(BaseModel):
