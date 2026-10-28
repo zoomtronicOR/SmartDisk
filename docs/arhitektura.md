@@ -7,7 +7,7 @@ Pregledač ──HTTPS──> Caddy (:443) ──┬── /api/*  ──> uvico
                                     └── ostalo ──> frontend/dist (statički React build)
 
 FastAPI proces
- ├─ API rute (auth, users, devices, storage, analytics, alarms, system)
+ ├─ API rute (auth, users, devices, storage, analytics, alarms, advanced, tokens, system)
  ├─ MQTT veza (aiomqtt, pozadinski zadatak: stanje, događaji, HA Discovery)
  ├─ APScheduler (AsyncIO) ── posao po uređaju ──> collector ──SSH──> TrueNAS / Proxmox / Synology
  │                                                 └─ adapters/ (komande, parseri) ──> persist.py
@@ -47,6 +47,8 @@ FastAPI proces
 | `event_history` (Faza 4) | istorija alarma: otvoren, eskalacija, ublažen, potvrđen, komentar, rešen, ponovo otvoren |
 | `push_subscriptions` (Faza 4) | Web Push pretplate pregledača: korisnik, najniži nivo, uređaji, utišano do, poslednja greška |
 | `notification_log` (Faza 4) | svako poslato ili neuspelo obaveštenje (push, e-pošta, MQTT) |
+
+| `api_tokens` (Faza 5) | API tokeni: SHA-256 heš, prefiks za prepoznavanje, dozvola (`read`/`operator`), rok, opoziv, poslednja upotreba |
 
 `disks` i `disk_samples` dobijaju `health_level` i `health_score` (zdravlje posle svakog očitavanja), a `disks` i razloge.
 
@@ -117,6 +119,19 @@ Posle svakog planiranog ili ručnog ciklusa `collector._evaluate` poziva `health
 - **Web Push**: VAPID par se generiše pri prvom korišćenju (privatni ključ je šifrovan). Service worker je `frontend/public/sw.js`. Pretplata ima najniži nivo, izbor uređaja i utišavanje. Nevažeća pretplata (404/410) se briše.
 - **E-pošta (SMTP)**: standardni `smtplib` u posebnoj niti, sa STARTTLS, SSL ili bez šifrovanja i najnižim nivoom za slanje. Lozinka je šifrovana. Postoji probna poruka sa unetim, još nesačuvanim podešavanjima.
 - **MQTT**: jedna veza (`notify/mqtt.py`) sa LWT (`<prefiks>/availability` = offline, retain), objavom stanja posle svakog ciklusa i heartbeat-om, i automatskim ponovnim povezivanjem (5 s → 5 min). Teme: `summary`, `devices/<id>/state`, `disks/<id>/state`, `pools/<id>/state` (retain) i `events` (QoS 1, bez retain). Home Assistant Discovery (`homeassistant/sensor/smartdisk_…/config`) je opcion, po vrsti entiteta; isključen entitet se uklanja praznom porukom. Nedostupne vrednosti su `null`. Serijski brojevi i SSH podaci se ne objavljuju, a komande se ne primaju.
+
+### Faza 5
+
+- **Vreme (§18.1)**: `timesync.py` šalje SNTP upit podešenom serveru i čita `timedatectl` (posao na svakih 15 min). Sistemski alarmi (`device_id` NULL): `time_offset`, `time_unsynced`, `ntp_unreachable`. Sat nadziranih uređaja se meri u istoj probe komandi (`date +%s`); odstupanje se čuva u `collection_runs.details.clock_offset_s` i daje alarm `device_clock`. Zaglavlje prikazuje vreme servera (pregledač meri razliku svog sata), u zoni prikaza.
+- **Promene inventara (§16.2)**: `persist.py` beleži nov disk, zamenu diska na istoj putanji, promenu modela, kapaciteta ili putanje i promenu sastava pool-a. Svaka promena je poseban događaj (kategorija `inventory`), koji ostaje do potvrde. Istorija se nikad ne briše.
+- **Prognoze (§16.1)**: `analytics.predictions` računa linearnu regresiju u bazi (`regr_slope`, `regr_r2`) za istrošenost, vek SSD-a, rezervu, sektore, temperaturu i zauzeće pool-ova. Svaka procena ima kvalitet („nepouzdano” ispod 10 očitavanja ili 7 dana, „okvirno” za R² < 0,5).
+- **Poređenje (§10.6)** i **mapa skladišta (§16.3)** su na frontendu, iz postojećih API-ja. Kontroleri se ne prikazuju, jer ih read-only komande ne izlažu pouzdano.
+- **Merači (gauges)** u Statistici: trenutna vrednost metrike po disku, sa zonama iz pragova alarma (`GET /api/thresholds`, dostupno svim ulogama).
+- **Kanali (§16.6)**: `notify/channels.py`, sa Telegram botom, Pushover-om i webhook-om (JSON, opcioni HMAC potpis `X-SmartDisk-Signature: sha256=…`). Tajne su šifrovane, a svaki kanal ima probno slanje i najniži nivo.
+- **Režim održavanja (§16.4)**: do zadatog vremena šalju se samo kritična obaveštenja. Preskakanje se beleži u evidenciji, a MQTT telemetrija radi i dalje.
+- **Zakazani izveštaji**: `schedules.py`, dnevno, nedeljno ili mesečno, PDF/XLSX/CSV u prilogu e-pošte. Proverava se svakog sata (`:05`), uz zaštitu od dvostrukog slanja.
+- **Backup (§16.5)**: `backup.py`, sa `pg_dump -Fc`, proverom (`pg_restore --list`), rotacijom i dnevnim poslom. Neuspeh daje alarm `backup_failed`. Vraćanje je opisano u instalacija.md.
+- **API tokeni (§16.7)**: `Authorization: Bearer sdk_…`. Uloga tokena je najviše operater (`read` = samo GET); token se prikazuje jednom; ima rok i opoziv; upravljanje tokenima je moguće samo prijavljenom korisniku (`session_user`), ne tokenom.
 
 ### Profili privilegija (spec. §5.3)
 
@@ -190,6 +205,16 @@ GET    /api/disks/{id}/samples?from=&to=&limit=
 GET    /api/disks/{id}/raw             (poslednji kompletan izlaz smartctl)
 GET    /api/pools?device_id=           GET  /api/pools/{id}
 GET    /api/platforms/{platform}/privileges
+
+GET    /api/system/time                PUT  /api/settings/time
+GET    /api/predictions?days=          GET  /api/thresholds
+GET    /api/notifications/channels     PUT  /api/notifications/channels/{telegram|pushover|webhook}
+POST   /api/notifications/channels/{name}/test
+PUT    /api/notifications/maintenance
+GET    /api/report-schedules           PUT  /api/report-schedules
+DELETE /api/report-schedules/{id}      POST /api/report-schedules/{id}/send
+GET    /api/backups                    POST /api/backups      PUT /api/backups/settings
+GET    /api/tokens                     POST /api/tokens       POST /api/tokens/{id}/revoke
 
 GET    /api/metrics/catalog            (spisak metrika za diskove i pool-ove)
 GET    /api/metrics/disks?ids=1,2&metric=&from=&to=&bucket=auto|raw|hour|day|week&format=json|csv|xlsx

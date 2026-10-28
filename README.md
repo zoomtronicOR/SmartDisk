@@ -12,8 +12,8 @@ Specifikacija projekta se vodi van repozitorijuma; oznake poput „spec. §8.8�
 | 2 – Prikupljanje | Adapteri za TrueNAS/Proxmox/Synology, inventar diskova, SMART/NVMe, ZFS/RAID | **Završeno** (SCALE i Synology čekaju proveru na uređaju) – [izveštaj](docs/faza-2-izvestaj.md) |
 | 3 – Dashboard i analitika | Grafikoni, statistika, izvoz | **Završeno** – [izveštaj](docs/faza-3-izvestaj.md) |
 | 4 – Degradacija i alarmi | Zdravlje diska, trendovi, alarmi, MQTT, Home Assistant, Web Push, e-pošta | **Završeno** – [izveštaj](docs/faza-4-izvestaj.md) |
-| 5 – Napredno | Poređenje, mapa skladišta, prediktivni trendovi | Sledeće |
-| Završetak | Korisničko uputstvo (spec. §20.1), dostupno i iz aplikacije | — |
+| 5 – Napredno | Poređenje, mapa skladišta, prognoze, promene inventara, zakazani izveštaji, Telegram/Pushover/webhook, API tokeni, backup, NTP i sat, merači | **Završeno** – [izveštaj](docs/faza-5-izvestaj.md) |
+| Završetak | Korisničko uputstvo (spec. §20.1), dostupno i iz aplikacije | Sledeće |
 
 ## Instalacija na LXC (u kratkim crtama)
 
@@ -33,6 +33,7 @@ Aplikacija je zatim dostupna na `https://<IP-kontejnera>`. Detalji su u [docs/in
 - [Izveštaj o Fazi 2](docs/faza-2-izvestaj.md)
 - [Izveštaj o Fazi 3](docs/faza-3-izvestaj.md)
 - [Izveštaj o Fazi 4](docs/faza-4-izvestaj.md)
+- [Izveštaj o Fazi 5](docs/faza-5-izvestaj.md)
 - [Obaveštenja: e-pošta, MQTT/Home Assistant, Web Push](docs/obavestenja.md)
 - API dokumentacija (OpenAPI/Swagger): `https://<IP-kontejnera>/api/docs`
 

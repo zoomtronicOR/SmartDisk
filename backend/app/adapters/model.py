@@ -124,3 +124,5 @@ class CollectResult:
     disks_complete: bool = False
     # Tehnologije skladišta koje su uspešno očitane (i kada nema nijednog pool-a).
     pool_sources: set[str] = field(default_factory=set)
+    # Promene inventara otkrivene pri upisu (spec. §16.2): {rule, disk_id|pool_id, title, message}
+    changes: list[dict[str, Any]] = field(default_factory=list)

@@ -133,6 +133,35 @@ ssh smartdisk-lxc 'runuser -u postgres -- pg_dump -Fc smartdisk > /root/smartdis
 
 Automatizovan backup i restore iz aplikacije stiže u kasnijoj fazi. Do tada važe ručne komande iznad.
 
+## Backup i vraćanje (spec. §16.5)
+
+Aplikacija pravi backup baze svake noći (podrazumevano u 02:05, čuva se poslednjih 14), a backup se može napraviti i ručno: *Podešavanja → Backup baze → Napravi backup sada*. Svaki backup se odmah proverava (`pg_restore --list` mora pročitati podatke svih tabela). Ako backup ne uspe, otvara se alarm „Backup baze nije uspeo”.
+
+- Fajlovi: `/var/lib/smartdisk/backups/smartdisk-GGGGMMDD-HHMMSS.dump` (custom format `pg_dump`, prava 0600).
+- Backup sadrži sve: uređaje, istoriju, alarme, korisnike, podešavanja i šifrovane kredencijale.
+- **Ne sadrži master ključ** (`/etc/smartdisk/smartdisk.env`). Njega treba čuvati posebno, van kontejnera (npr. u menadžeru lozinki). Bez njega se baza može vratiti, ali šifrovani SSH ključevi, SMTP i MQTT lozinke nisu upotrebljivi: ključeve uređaja treba ponovo generisati, a lozinke ponovo uneti.
+- Backup kopirati i van kontejnera, npr. Proxmox backup-om celog LXC-a ili `scp`:
+  ```bash
+  scp smartdisk-lxc:/var/lib/smartdisk/backups/smartdisk-*.dump .
+  ```
+
+Vraćanje (na kontejneru, kao root). Postupak je proveren na kopiji baze:
+
+```bash
+systemctl stop smartdisk-api
+F=/var/lib/smartdisk/backups/smartdisk-20261028-233426.dump       # izabrani backup
+runuser -u postgres -- dropdb smartdisk
+runuser -u postgres -- createdb -O smartdisk smartdisk
+runuser -u postgres -- pg_restore --no-owner --role=smartdisk -d smartdisk < "$F"   # fajl čita root (prava 0600)
+systemctl start smartdisk-api
+```
+
+Na novom kontejneru: prvo `install.sh` (pravi bazu i korisnika), zatim vratiti **isti** `/etc/smartdisk/smartdisk.env` iz rezervne kopije, pa izvršiti korake iznad. Probno vraćanje bez diranja produkcije: `createdb smartdisk_restore_test`, `pg_restore` u nju, provera broja redova, pa `dropdb`.
+
+## Vreme (NTP)
+
+Kontejner je unprivileged i koristi sat Proxmox hosta, pa se vreme podešava NTP-om **na hostu** (na Proxmox VE 9 radi `chrony`). Aplikacija na svakih 15 minuta proverava `timedatectl` i odstupanje od NTP servera (podrazumevano `pool.ntp.org`, menja se u *Podešavanja → Vreme i NTP*). Ako je odstupanje preko 2 s, otvara se upozorenje, a preko 30 s kritičan alarm. Datum i vreme servera stalno se vide u zaglavlju aplikacije.
+
 ## Logovi i dijagnostika
 
 ```bash

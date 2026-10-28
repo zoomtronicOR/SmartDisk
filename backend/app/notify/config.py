@@ -46,6 +46,9 @@ DEFAULTS: dict[str, dict[str, Any]] = {
     GENERAL: {
         "base_url": "",  # adresa aplikacije za linkove u obaveštenjima, npr. https://192.168.88.246
         "notify_resolved": True,
+        # Režim održavanja (spec. §16.4): do ovog trenutka šalju se samo kritična obaveštenja.
+        "maintenance_until": None,
+        "maintenance_note": "",
     },
 }
 
@@ -71,6 +74,13 @@ async def save(db: AsyncSession, key: str, data: dict[str, Any], username: str |
     else:
         row.value = data
         row.updated_by = username
+
+
+async def load_raw(db: AsyncSession, key: str) -> dict[str, Any] | None:
+    from ..models import AppSetting
+
+    row = await db.get(AppSetting, key)
+    return row.value if row is not None and isinstance(row.value, dict) else None
 
 
 def public(data: dict[str, Any]) -> dict[str, Any]:

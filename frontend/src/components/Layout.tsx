@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { BellRing, ChartLine, Database, FileText, HardDrive, LayoutDashboard, LogOut, Menu, Moon, ScrollText, Server, Settings, Sun, UserCircle, Users } from "lucide-react";
+import { BellRing, ChartLine, Columns3, Database, Network, FileText, HardDrive, LayoutDashboard, LogOut, Menu, Moon, ScrollText, Server, Settings, Sun, UserCircle, Users } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { ROLE_LABELS, setDisplayTimezone } from "../format";
 import type { AlarmSummary, SystemStatus } from "../types";
+import Clock from "./Clock";
 import { Alert, Spinner } from "./ui";
 
 function useTheme() {
@@ -52,6 +53,8 @@ export default function Layout() {
     { to: "/uredjaji", label: "Uređaji", icon: Server },
     { to: "/diskovi", label: "Diskovi", icon: HardDrive },
     { to: "/skladiste", label: "Skladište", icon: Database },
+    { to: "/mapa", label: "Mapa skladišta", icon: Network },
+    { to: "/poredjenje", label: "Poređenje", icon: Columns3 },
     { to: "/statistika", label: "Statistika", icon: ChartLine },
     { to: "/izvestaji", label: "Izveštaji", icon: FileText },
     ...(admin
@@ -67,7 +70,7 @@ export default function Layout() {
   return (
     <div className="flex min-h-screen">
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-60 border-r border-slate-200 bg-white transition-transform dark:border-slate-800 dark:bg-slate-900 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -75,7 +78,7 @@ export default function Layout() {
           <HardDrive className="size-6 text-brand-600" />
           <span className="text-lg font-semibold">SmartDisk</span>
         </div>
-        <nav className="space-y-1 px-3">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 pb-10">
           {nav.map(({ to, label, icon: Icon, end, badge }: { to: string; label: string; icon: typeof Server; end?: boolean; badge?: boolean }) => (
             <NavLink
               key={to}
@@ -112,6 +115,7 @@ export default function Layout() {
           <button className="rounded p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" onClick={() => setMenuOpen(true)} aria-label="Meni">
             <Menu className="size-5" />
           </button>
+          <Clock />
           <div className="flex-1" />
           <span className="hidden text-sm text-slate-600 dark:text-slate-300 sm:inline">
             {user?.username} · {user && ROLE_LABELS[user.role]}

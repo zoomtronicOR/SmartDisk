@@ -7,7 +7,7 @@ export function setDisplayTimezone(tz: string) {
 }
 
 export function formatDateTime(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso || Number.isNaN(new Date(iso).getTime())) return "—"; // neispravan datum ne sme da obori ekran
   return new Intl.DateTimeFormat("sr-Latn-RS", {
     timeZone: timezone,
     day: "2-digit",
@@ -20,7 +20,7 @@ export function formatDateTime(iso: string | null | undefined): string {
 }
 
 export function formatRelative(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso || Number.isNaN(new Date(iso).getTime())) return "—";
   const diff = Math.round((new Date(iso).getTime() - Date.now()) / 1000);
   const abs = Math.abs(diff);
   const rtf = new Intl.RelativeTimeFormat("sr-Latn", { numeric: "auto" });

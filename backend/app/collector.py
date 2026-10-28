@@ -103,12 +103,18 @@ async def _collect(device_id: int, trigger: str, initiated_by: str | None) -> in
     # SSH deo se radi bez otvorene DB sesije.
     started = time.monotonic()
     probe = None
+    clock_offset: int | None = None
     collected: CollectResult | None = None
     if info is not None:
         try:
             async with connect(info) as conn:
+                sent = time.time()
                 result = await run_command(conn, PROBE_COMMAND, command_timeout)
+                received = time.time()
                 probe = parse_probe(result.stdout, platform)
+                if probe.device_epoch is not None:
+                    # Odstupanje sata uređaja (±1 s zbog celih sekundi i trajanja komande)
+                    clock_offset = probe.device_epoch - round((sent + received) / 2)
                 if full:
                     collected = await platforms.collect(
                         platform,
@@ -147,6 +153,7 @@ async def _collect(device_id: int, trigger: str, initiated_by: str | None) -> in
                 "detected_platform": probe.detected_platform,
                 "smartctl_version": probe.smartctl_version,
                 "warnings": probe.warnings,
+                "clock_offset_s": clock_offset,
             }
             if collected is not None:
                 disk_ids = await save_disks(db, device_id, run_id, collected, now)
@@ -186,13 +193,14 @@ async def _collect(device_id: int, trigger: str, initiated_by: str | None) -> in
     # Procena zdravlja i alarma (Faza 4). Test konekcije ne menja alarme. Greška ovde ne sme oboriti ciklus.
     if trigger != "test":
         try:
-            await _evaluate(device_id, collected is not None and error is None)
+            await _evaluate(device_id, collected is not None and error is None,
+                            collected.changes if collected is not None and error is None else [])
         except Exception:
             log.exception("Procena zdravlja i alarma za uređaj %s nije uspela", device_id)
     return run_id
 
 
-async def _evaluate(device_id: int, collected: bool) -> None:
+async def _evaluate(device_id: int, collected: bool, changes: list[dict] | None = None) -> None:
     async with SessionLocal() as db:
         device = await db.get(Device, device_id)
         if device is None:
@@ -200,6 +208,15 @@ async def _evaluate(device_id: int, collected: bool) -> None:
         th = await notify_config.thresholds(db)
         open_fps = await events.open_fingerprints(db, device_id)
         evaluation = await health.evaluate_device(db, device, th, open_fps, collected)
+        # Promene inventara (spec. §16.2) su pojedinačni događaji: svaki je poseban alarm koji ostaje do potvrde.
+        stamp = utcnow().strftime("%Y%m%d%H%M%S")
+        for ch in changes or []:
+            target = f"disk:{ch['disk_id']}" if ch.get("disk_id") else f"pool:{ch.get('pool_id')}"
+            evaluation.conditions.append(health.Condition(
+                f"{target}:{ch['rule']}:{stamp}", "info" if ch["rule"] == "disk_added" else "warning", "inventory",
+                ch["rule"], f"{device.name}: {ch['title']}", ch["message"], device.id,
+                disk_id=ch.get("disk_id"), pool_id=ch.get("pool_id"),
+            ))
         now = utcnow()
         if evaluation.health:
             disks = {d.id: d for d in await db.scalars(select(Disk).where(Disk.id.in_(list(evaluation.health))))}

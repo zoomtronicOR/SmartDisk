@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import PushCard from "../components/PushCard";
+import TokensCard from "../components/TokensCard";
 import { Alert, Button, Card, ErrorText, Field, Input } from "../components/ui";
 import { formatDateTime, ROLE_LABELS } from "../format";
 
@@ -88,6 +89,7 @@ export default function AccountPage({ forced = false }: { forced?: boolean }) {
       </Card>
       <Card title="Promena lozinke">{form}</Card>
       <PushCard />
+      <TokensCard />
     </div>
   );
 }

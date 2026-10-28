@@ -1,10 +1,11 @@
 """Podešavanja, pregled (dashboard), audit log, zdravlje aplikacije."""
 
 import shutil
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, Request
+from pydantic import BaseModel, Field
 from sqlalchemy import false, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,7 +60,28 @@ async def system_status(_: User = Depends(current_user), db: AsyncSession = Depe
         "disk_total_bytes": disk.total,
         "disk_free_bytes": disk.free,
         "last_successful_collection_at": last_success,
+        "mqtt": _mqtt_status(),
+        "time": _time_status(),
+        "last_backup": await _last_backup(db),
     }
+
+
+def _mqtt_status() -> dict[str, Any]:
+    from ..notify import mqtt
+
+    return mqtt.status()
+
+
+def _time_status() -> dict[str, Any]:
+    from .. import timesync
+
+    return timesync.status()
+
+
+async def _last_backup(db: AsyncSession) -> dict[str, Any] | None:
+    from .advanced import backup_settings
+
+    return (await backup_settings(db)).get("last")
 
 
 @router.get("/dashboard/summary")
@@ -174,6 +196,32 @@ async def put_collection_settings(
     await db.commit()
     await scheduler.sync_all()
     return CollectionSettings(default_interval_minutes=body.default_interval_minutes, raw_retention_days=retention)
+
+
+@router.get("/system/time")
+async def system_time(_: User = Depends(current_user), db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
+    """Vreme servera i stanje NTP sinhronizacije (spec. §18.1). Klijent iz server_time računa svoje odstupanje."""
+    from .. import timesync
+
+    return {"server_time": datetime.now(UTC), "timezone": await settings_store.get_setting(db, settings_store.TIMEZONE),
+            "ntp_server": await settings_store.get_setting(db, settings_store.NTP_SERVER), **timesync.status()}
+
+
+class TimeSettingsIn(BaseModel):
+    ntp_server: str = Field(..., min_length=1, max_length=253, pattern=r"^[A-Za-z0-9.-]+$")
+
+
+@router.put("/settings/time")
+async def put_time_settings(body: TimeSettingsIn, request: Request, admin: User = Depends(admin_only),
+                            db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
+    from .. import timesync
+
+    old = await settings_store.get_setting(db, settings_store.NTP_SERVER)
+    await settings_store.set_setting(db, settings_store.NTP_SERVER, body.ntp_server, admin.username)
+    audit(db, request, admin, "settings.time_updated", "settings", "time", {"ntp_server": {"from": old, "to": body.ntp_server}})
+    await db.commit()
+    st = await timesync.check(body.ntp_server)
+    return {"ntp_server": body.ntp_server, "offset_ms": st.offset_ms, "error": st.error}
 
 
 @router.get("/settings/general", response_model=GeneralSettings)

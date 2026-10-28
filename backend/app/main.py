@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from . import __version__, scheduler
 from .config import get_settings
 from .notify import mqtt
-from .routers import alarms, analytics, auth, devices, storage, system, users
+from .routers import advanced, alarms, analytics, auth, devices, storage, system, tokens, users
 
 logging.basicConfig(
     level=get_settings().log_level,
@@ -75,3 +75,5 @@ app.include_router(system.router)
 app.include_router(storage.router)
 app.include_router(analytics.router)
 app.include_router(alarms.router)
+app.include_router(advanced.router)
+app.include_router(tokens.router)

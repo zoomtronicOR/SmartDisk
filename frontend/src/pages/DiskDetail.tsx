@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { DiskCharts, DiskTrendsCard } from "../components/DiskAnalytics";
 import { DiskHealthCard, HealthBadge } from "../components/Health";
+import PredictionsCard from "../components/Predictions";
 import { SerialNumber, Temperature } from "../components/storage";
 import { Alert, Badge, Button, Card, EmptyState, ErrorText, Modal, Spinner, Table, Td } from "../components/ui";
 import {
@@ -183,6 +184,8 @@ export default function DiskDetailPage() {
       <DiskTrendsCard diskId={d.id} />
 
       <DiskCharts diskId={d.id} diskType={d.disk_type} />
+
+      <PredictionsCard diskId={d.id} />
 
       <Card title="SMART self-testovi">
         {d.self_tests.length === 0 ? (

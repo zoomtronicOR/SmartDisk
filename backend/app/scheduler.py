@@ -118,6 +118,58 @@ async def _aggregate_daily() -> None:
     log.info("Dnevni agregati su ažurirani")
 
 
+async def _check_time() -> None:
+    """NTP provera i sistemski alarmi za vreme (spec. §18.1)."""
+    from . import events, health, timesync
+    from .notify import config as notify_config
+    from .notify import dispatcher
+
+    async with SessionLocal() as db:
+        server = await settings_store.get_setting(db, settings_store.NTP_SERVER)
+    st = await timesync.check(server)
+    async with SessionLocal() as db:
+        th = await notify_config.thresholds(db)
+        conds = health.system_conditions(timesync.status(), th)
+        evaluation = health.Evaluation(conds, {}, {"ntp_unreachable", "time_offset", "time_unsynced"})
+        notices = await events.apply(db, None, evaluation, th)
+        await db.commit()
+    await dispatcher.dispatch(notices)
+    log.debug("NTP provera: odstupanje %s ms, greška: %s", st.offset_ms, st.error)
+
+
+async def _hourly() -> None:
+    """Zakazani izveštaji i dnevni backup (proverava se svakog sata)."""
+    from . import events, health, schedules
+    from .notify import config as notify_config
+    from .notify import dispatcher
+    from .routers.advanced import backup_settings, run_backup
+
+    try:
+        await schedules.run_due()
+    except Exception:
+        log.exception("Zakazani izveštaji nisu obrađeni")
+    async with SessionLocal() as db:
+        cfg = await backup_settings(db)
+        tz = await settings_store.get_setting(db, settings_store.TIMEZONE)
+    from zoneinfo import ZoneInfo
+
+    now_local = datetime.now(ZoneInfo(tz))
+    last = (cfg.get("last") or {}).get("finished_at")
+    done_today = last and datetime.fromisoformat(last).astimezone(now_local.tzinfo).date() == now_local.date()
+    if not cfg.get("enabled") or now_local.hour != int(cfg.get("hour", 2)) or done_today:
+        return
+    info = await run_backup("scheduler")
+    async with SessionLocal() as db:
+        th = await notify_config.thresholds(db)
+        conds = []
+        if info["status"] != "ok":
+            conds.append(health.Condition("system:backup_failed", "high", "system", "backup_failed",
+                                          "Backup baze nije uspeo", info.get("error") or "Nepoznata greška.", None))
+        notices = await events.apply(db, None, health.Evaluation(conds, {}, {"backup_failed"}), th)
+        await db.commit()
+    await dispatcher.dispatch(notices)
+
+
 async def _cleanup_samples() -> None:
     """Brisanje sirovih merenja starijih od podešenog perioda (podrazumevano 12 meseci)."""
     async with SessionLocal() as db:
@@ -136,7 +188,10 @@ async def start() -> None:
     scheduler.add_job(_heartbeat, "interval", seconds=HEARTBEAT_SECONDS, id="heartbeat", replace_existing=True)
     scheduler.add_job(_cleanup_sessions, "interval", hours=1, id="cleanup_sessions", replace_existing=True)
     scheduler.add_job(_aggregate_daily, "cron", hour=3, minute=15, id="aggregate_daily", replace_existing=True)
+    scheduler.add_job(_check_time, "interval", minutes=15, id="check_time", replace_existing=True,
+                      next_run_time=utcnow() + timedelta(seconds=20))
     scheduler.add_job(_cleanup_samples, "cron", hour=3, minute=30, id="cleanup_samples", replace_existing=True)
+    scheduler.add_job(_hourly, "cron", minute=5, id="hourly", replace_existing=True)
     scheduler.start()
     await sync_all()
     log.info("Scheduler pokrenut, poslova prikupljanja: %s", job_count())

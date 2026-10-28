@@ -40,6 +40,7 @@ _SCRIPT = (
     'echo "@@truenas"; cat /etc/version 2>/dev/null; '
     f'echo "@@tools"; for t in {_TOOL_LIST}; do echo "$t=$(command -v "$t" 2>/dev/null)"; done; '
     'echo "@@smartctl"; smartctl --version 2>/dev/null | head -n 1; '
+    'echo "@@epoch"; date +%s; '
     "true"
 )
 
@@ -53,6 +54,7 @@ class ProbeResult:
     tools: dict[str, str | None]  # alat -> putanja ili None
     smartctl_version: str | None
     warnings: list[str] = field(default_factory=list)
+    device_epoch: int | None = None  # sat uređaja (Unix vreme) u trenutku izvršavanja
 
 
 def _sections(output: str) -> dict[str, str]:
@@ -119,4 +121,6 @@ def parse_probe(output: str, configured_platform: str) -> ProbeResult:
         if not tools.get(tool):
             warnings.append(f"Alat „{tool}” nije pronađen – nedostupno: {TOOLS[tool]}.")
 
-    return ProbeResult(os_info[:255], detected, tools, smartctl_version, warnings)
+    epoch = s.get("epoch", "").strip()
+    return ProbeResult(os_info[:255], detected, tools, smartctl_version, warnings,
+                       int(epoch) if epoch.isdigit() else None)

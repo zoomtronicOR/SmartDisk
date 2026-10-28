@@ -59,6 +59,9 @@ DEFAULT_THRESHOLDS: dict[str, Any] = {
     "unreachable_runs": 2,
     "partial_runs": 3,
     "no_data_runs": 3,
+    "time_offset_warning_ms": 2000,  # odstupanje sata servera od NTP-a
+    "time_offset_critical_ms": 30000,
+    "device_clock_warning_s": 60,  # odstupanje sata nadziranog uređaja
     "confirmations": 1,  # koliko uzastopnih procena mora potvrditi uslov pre otvaranja alarma
     "cooldown_minutes": 60,
     "renotify_hours": 24,
@@ -90,7 +93,7 @@ class Condition:
     rule: str
     title: str
     message: str
-    device_id: int
+    device_id: int | None
     disk_id: int | None = None
     pool_id: int | None = None
     metric: str | None = None
@@ -434,6 +437,29 @@ def correlate(device: Device, pools: list[StoragePool], conditions: list[Conditi
     return out
 
 
+def system_conditions(time_status: dict[str, Any], th: dict[str, Any]) -> list[Condition]:
+    """Sistemski uslovi bez uređaja (spec. §18.1): tačnost vremena servera."""
+    out: list[Condition] = []
+    offset = time_status.get("offset_ms")
+    if time_status.get("error"):
+        out.append(Condition("system:ntp_unreachable", "warning", "system", "ntp_unreachable",
+                             "Tačnost vremena se ne može proveriti", time_status["error"]
+                             + " Trendovi i alarmi zavise od tačnog vremena; proverite NTP server u podešavanjima.", None))
+    elif offset is not None and abs(offset) >= th["time_offset_warning_ms"]:
+        sev = "critical" if abs(offset) >= th["time_offset_critical_ms"] else "warning"
+        out.append(Condition("system:time_offset", sev, "system", "time_offset",
+                             f"Sat servera odstupa {offset / 1000:+.1f} s od NTP-a",
+                             f"Sat SmartDisk servera odstupa {offset:+.0f} ms od {time_status.get('ntp_server')}. "
+                             "U LXC kontejneru sat dolazi od Proxmox hosta – proverite NTP na hostu.",
+                             None, metric="time_offset_ms", current_value=offset))
+    if time_status.get("host_synchronized") is False:
+        out.append(Condition("system:time_unsynced", "warning", "system", "time_unsynced",
+                             "Sat nije sinhronizovan sa NTP-om",
+                             "Sistem prijavljuje da vreme nije sinhronizovano (timedatectl NTPSynchronized=no). "
+                             "Proverite NTP na Proxmox hostu.", None))
+    return out
+
+
 async def device_conditions(db: AsyncSession, device: Device, th: dict[str, Any]) -> list[Condition]:
     """Dostupnost uređaja i kompletnost prikupljanja iz poslednjih ciklusa."""
     runs = list(await db.scalars(
@@ -454,6 +480,14 @@ async def device_conditions(db: AsyncSession, device: Device, th: dict[str, Any]
                              f"Poslednjih {failed} ciklusa prikupljanja nije uspelo. Poslednja greška: {last.error_message}. "
                              "Nedostupan uređaj ne znači neispravan disk, ali podaci sada nisu ažurni.",
                              device.id, details={"failed_runs": failed, "error_kind": last.error_kind}))
+    last_ok = next((r for r in runs if r.status in ("success", "partial")), None)
+    skew = (last_ok.details or {}).get("clock_offset_s") if last_ok else None
+    if skew is not None and abs(skew) >= th["device_clock_warning_s"]:
+        out.append(Condition(f"device:{device.id}:clock", "warning", "device", "device_clock",
+                             f"{device.name}: sat uređaja odstupa {skew:+d} s",
+                             f"Sat uređaja {device.name} odstupa {skew:+d} s od SmartDisk servera. "
+                             "Vremena u logovima uređaja i SMART self-testovima mogu biti pogrešna; proverite NTP na uređaju.",
+                             device.id, metric="clock_offset_s", current_value=skew))
     partial = 0
     for run in runs:
         if run.status != "partial":
@@ -471,7 +505,7 @@ async def evaluate_device(db: AsyncSession, device: Device, th: dict[str, Any], 
                           collected: bool) -> Evaluation:
     """Kompletna procena uređaja. Kada ciklus nije uspeo (collected=False), proveravaju se samo pravila uređaja."""
     conditions = await device_conditions(db, device, th)
-    rules = {"device_unreachable", "collection_partial"}
+    rules = {"device_unreachable", "collection_partial", "device_clock"}
     health: dict[int, DiskHealth] = {}
     if not collected:
         return Evaluation(conditions, health, rules)

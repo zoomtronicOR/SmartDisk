@@ -14,7 +14,8 @@ class EmailError(Exception):
     pass
 
 
-def _send_sync(cfg: dict[str, Any], pwd: str | None, subject: str, body: str, recipients: list[str]) -> None:
+def _send_sync(cfg: dict[str, Any], pwd: str | None, subject: str, body: str, recipients: list[str],
+               attachments: list[tuple[str, bytes, str]] | None = None) -> None:
     msg = EmailMessage()
     msg["From"] = cfg["from_addr"]
     msg["To"] = ", ".join(recipients)
@@ -22,6 +23,9 @@ def _send_sync(cfg: dict[str, Any], pwd: str | None, subject: str, body: str, re
     msg["Date"] = formatdate(localtime=True)
     msg["Message-ID"] = make_msgid(domain="smartdisk")
     msg.set_content(body)
+    for filename, data, mime in attachments or []:
+        maintype, _, subtype = mime.split(";")[0].partition("/")
+        msg.add_attachment(data, maintype=maintype, subtype=subtype, filename=filename)
     timeout = int(cfg.get("timeout") or 20)
     context = ssl.create_default_context()
     try:
@@ -51,10 +55,11 @@ def _send_sync(cfg: dict[str, Any], pwd: str | None, subject: str, body: str, re
         raise EmailError(f"SMTP greška: {exc}") from exc
 
 
-async def send(cfg: dict[str, Any], subject: str, body: str, recipients: list[str] | None = None) -> None:
+async def send(cfg: dict[str, Any], subject: str, body: str, recipients: list[str] | None = None,
+               attachments: list[tuple[str, bytes, str]] | None = None) -> None:
     if not cfg.get("host") or not cfg.get("from_addr"):
         raise EmailError("SMTP nije podešen (server i adresa pošiljaoca su obavezni).")
     to = recipients or cfg.get("recipients") or []
     if not to:
         raise EmailError("Nema primalaca.")
-    await asyncio.to_thread(_send_sync, cfg, config.password(cfg), subject, body, to)
+    await asyncio.to_thread(_send_sync, cfg, config.password(cfg), subject, body, to, attachments)

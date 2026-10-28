@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import IntervalInput from "../components/IntervalInput";
+import AdvancedSettingsSection from "../components/AdvancedSettings";
 import NotificationSettingsSection from "../components/NotificationSettings";
 import { Alert, Button, Card, ErrorText, Field, Input, Select, Spinner } from "../components/ui";
 import { formatBytes, formatDateTime } from "../format";
@@ -95,6 +96,8 @@ export default function SettingsPage() {
       </Card>
 
       <NotificationSettingsSection />
+
+      <AdvancedSettingsSection />
 
       {system.data && (
         <Card title="Stanje aplikacije">

@@ -444,3 +444,24 @@ class NotificationLog(Base):
     sent_at: Mapped[datetime] = mapped_column(server_default=func.now(), index=True)
     status: Mapped[str] = mapped_column(String(16))  # sent / failed / skipped
     error_message: Mapped[str | None] = mapped_column(Text)
+
+
+# --- Faza 5: API tokeni ---
+
+
+class ApiToken(Base):
+    """API token (spec. §16.7): ograničene dozvole, datum isteka, opoziv. Čuva se samo SHA-256 heš."""
+
+    __tablename__ = "api_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    name: Mapped[str] = mapped_column(String(100))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    prefix: Mapped[str] = mapped_column(String(16))  # prvi znaci tokena, za prepoznavanje u listi
+    scope: Mapped[str] = mapped_column(String(16))  # read / operator
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    expires_at: Mapped[datetime | None]
+    revoked_at: Mapped[datetime | None]
+    last_used_at: Mapped[datetime | None]
+    last_used_ip: Mapped[str | None] = mapped_column(String(64))

@@ -295,3 +295,69 @@ async def aggregate_daily(db: AsyncSession) -> None:
             read_errors = EXCLUDED.read_errors, write_errors = EXCLUDED.write_errors,
             checksum_errors = EXCLUDED.checksum_errors
     """), params)
+
+
+# --- Prognoze (spec. §16.1): linearni trend iz istorije, uvek označen kao procena ---
+
+PREDICT_DISK = {
+    "percentage_used": ("NVMe istrošenost", "%", 100.0, "up"),
+    "ssd_life_left": ("Preostali vek SSD-a", "%", 0.0, "down"),
+    "available_spare": ("NVMe rezerva", "%", None, "down"),
+    "reallocated_sectors": ("Realocirani sektori", "", None, "up"),
+    "pending_sectors": ("Pending sektori", "", None, "up"),
+    "temperature_c": ("Temperatura", "°C", None, "up"),
+}
+
+
+def _quality(n: int, span_days: float, r2: float | None) -> tuple[str, str]:
+    if n < 10 or span_days < 7:
+        return "low", f"Malo podataka ({n} očitavanja za {span_days:.1f} dana) – procena nije pouzdana."
+    if r2 is not None and r2 < 0.5:
+        return "medium", f"Vrednosti nisu ravnomerne (R² = {r2:.2f}) – trend je okviran."
+    return "good", f"{n} očitavanja za {span_days:.0f} dana" + (f", R² = {r2:.2f}" if r2 is not None else "") + "."
+
+
+async def predictions(db: AsyncSession, days: int = 90) -> dict[str, Any]:
+    """Nagib (po danu) i procena dostizanja granice za diskove i pool-ove. Regresija se računa u bazi."""
+    since = datetime.now().astimezone() - timedelta(days=days)
+    disk_rows = []
+    for col, (label, unit, limit, direction) in PREDICT_DISK.items():
+        rows = (await db.execute(text(f"""
+            SELECT s.disk_id, regr_slope(s.{col}, extract(epoch FROM s.collected_at) / 86400.0) AS slope,
+                   regr_r2(s.{col}, extract(epoch FROM s.collected_at) / 86400.0) AS r2, count(s.{col}) AS n,
+                   extract(epoch FROM max(s.collected_at) - min(s.collected_at)) / 86400.0 AS span,
+                   (array_agg(s.{col} ORDER BY s.collected_at DESC))[1] AS last
+            FROM disk_samples s JOIN disks d ON d.id = s.disk_id
+            WHERE s.collected_at >= :since AND s.{col} IS NOT NULL AND d.is_present
+            GROUP BY s.disk_id HAVING count(s.{col}) >= 2
+        """), {"since": since})).mappings().all()
+        for r in rows:
+            slope = float(r["slope"]) if r["slope"] is not None else 0.0
+            if col != "temperature_c" and abs(slope) < 1e-9 and limit is None:
+                continue  # stabilni brojači nemaju šta da se prognozira
+            eta = None
+            if limit is not None and r["last"] is not None and slope != 0:
+                remaining = (limit - float(r["last"])) / slope
+                eta = remaining if remaining > 0 else None
+            quality, note = _quality(r["n"], float(r["span"] or 0), float(r["r2"]) if r["r2"] is not None else None)
+            disk_rows.append({
+                "disk_id": r["disk_id"], "metric": col, "label": label, "unit": unit, "direction": direction,
+                "last": r["last"], "slope_per_day": slope, "slope_per_30d": slope * 30, "limit": limit,
+                "days_to_limit": eta, "quality": quality, "quality_note": note, "samples": r["n"],
+                "span_days": float(r["span"] or 0),
+            })
+    pool_rows = []
+    rows = (await db.execute(text("""
+        SELECT s.pool_id, regr_slope(s.used_bytes, extract(epoch FROM s.collected_at) / 86400.0) AS slope,
+               regr_r2(s.used_bytes, extract(epoch FROM s.collected_at) / 86400.0) AS r2, count(s.used_bytes) AS n,
+               extract(epoch FROM max(s.collected_at) - min(s.collected_at)) / 86400.0 AS span
+        FROM pool_samples s JOIN storage_pools p ON p.id = s.pool_id
+        WHERE s.collected_at >= :since AND s.used_bytes IS NOT NULL AND p.is_present AND p.technology <> 'lvm_vg'
+        GROUP BY s.pool_id HAVING count(s.used_bytes) >= 2
+    """), {"since": since})).mappings().all()
+    for r in rows:
+        slope = float(r["slope"] or 0)
+        quality, note = _quality(r["n"], float(r["span"] or 0), float(r["r2"]) if r["r2"] is not None else None)
+        pool_rows.append({"pool_id": r["pool_id"], "slope_bytes_per_day": slope, "quality": quality,
+                          "quality_note": note, "samples": r["n"], "span_days": float(r["span"] or 0)})
+    return {"days": days, "disks": disk_rows, "pools": pool_rows}

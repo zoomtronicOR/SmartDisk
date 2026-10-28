@@ -9,7 +9,9 @@ from ..db import SessionLocal
 from ..events import Notice
 from ..health import SEVERITY_RANK
 from ..models import Device, Event, NotificationLog, PushSubscription, utcnow
-from . import config, email, mqtt, push
+from datetime import datetime
+
+from . import channels, config, email, mqtt, push
 
 log = logging.getLogger("smartdisk.notify")
 
@@ -56,6 +58,35 @@ async def _dispatch_one(notice: Notice) -> None:
             logs.append(NotificationLog(event_id=event.id, channel="mqtt", target="events", status="sent"))
 
         # E-pošta
+        # Režim održavanja: ne-kritična obaveštenja se ne šalju (MQTT telemetrija ide i dalje).
+        until = general.get("maintenance_until")
+        if until and event.severity != "critical" and datetime.fromisoformat(until) > utcnow():
+            db.add(NotificationLog(event_id=event.id, channel="all", status="skipped",
+                                   error_message=f"Režim održavanja do {until}"))
+            if notice.kind != "resolved":
+                event.last_notified_at = utcnow()
+                event.notified_severity = event.severity
+            for entry in logs:
+                db.add(entry)
+            await db.commit()
+            return
+
+        # Telegram, Pushover, webhook
+        extra = channels.merged((await config.load_raw(db, channels.CHANNELS)))
+        for name, ch in extra.items():
+            if not ch.get("enabled") or (SEVERITY_RANK[event.severity] < SEVERITY_RANK[ch.get("min_severity", "high")]
+                                         and notice.kind != "resolved"):
+                continue
+            payload = {"id": event.id, "kind": notice.kind, "severity": event.severity, "status": event.status,
+                       "title": event.title, "message": event.message, "device": device.name if device else None,
+                       "disk_id": event.disk_id, "pool_id": event.pool_id, "url": url,
+                       "first_seen_at": event.first_seen_at, "last_seen_at": event.last_seen_at}
+            try:
+                await channels.send(name, ch, title, body, url, event.severity, payload)
+                logs.append(NotificationLog(event_id=event.id, channel=name, status="sent"))
+            except channels.ChannelError as exc:
+                logs.append(NotificationLog(event_id=event.id, channel=name, status="failed", error_message=str(exc)))
+
         mail = await config.load(db, config.EMAIL)
         if mail.get("enabled") and SEVERITY_RANK[event.severity] >= SEVERITY_RANK[mail.get("min_severity", "high")]:
             text = (f"{body}\n\nUređaj: {device.name if device else '—'}\nNivo: {SEVERITY_LABEL[event.severity]}\n"

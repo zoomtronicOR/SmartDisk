@@ -1,7 +1,7 @@
 # Izveštaj – Faza 3: Dashboard i analitika
 
 **Datum:** 28.10.2026.
-**Verzija:** 0.1.0 + migracija `0003`
+**Verzija:** 0.3.0 + migracija `0003` (aplikacija je tada greškom još prikazivala 0.1.0)
 **Okruženje:** LXC `Smart-Disk`, `https://192.168.88.246`
 
 ## Isporučeno (spec. §22, Faza 3)

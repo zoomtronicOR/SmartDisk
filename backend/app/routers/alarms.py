@@ -241,6 +241,12 @@ def _merge_secret(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     return new
 
 
+@router.get("/thresholds")
+async def current_thresholds(_: User = Depends(current_user), db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
+    """Pragovi alarma za prikaz (merači, zone) – dostupno svim ulogama, bez podešavanja kanala."""
+    return await config.thresholds(db)
+
+
 @router.get("/notifications/settings")
 async def notification_settings(_: User = Depends(admin_only), db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     return {
@@ -312,7 +318,7 @@ async def test_mqtt(body: MqttSettingsIn, _: User = Depends(admin_only), db: Asy
 @router.put("/notifications/general")
 async def put_general(body: GeneralNotifyIn, request: Request, admin: User = Depends(admin_only),
                       db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
-    data = body.model_dump()
+    data = {**await config.load(db, config.GENERAL), **body.model_dump()}  # režim održavanja ostaje
     await config.save(db, config.GENERAL, data, admin.username)
     audit(db, request, admin, "settings.notify_general_updated", "settings", "notify", data)
     await db.commit()

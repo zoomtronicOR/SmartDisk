@@ -1,7 +1,7 @@
 # Izveštaj – Faza 2: Prikupljanje podataka
 
 **Datum:** 28.10.2026.
-**Verzija:** 0.1.0 + migracija `0002`
+**Verzija:** 0.2.0 + migracija `0002` (aplikacija je tada greškom još prikazivala 0.1.0)
 **Okruženje:** LXC `Smart-Disk`, `https://192.168.88.246`
 
 ## Isporučeno (spec. §22, Faza 2)

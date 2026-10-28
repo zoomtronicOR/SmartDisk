@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { ChartLine, Gauge } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
+import DiskGauges from "../components/Gauges";
+import PredictionsCard from "../components/Predictions";
 import { BUCKET_LABEL, PeriodPicker, SERIES_COLORS, TimeChart, formatMetric, periodFromPreset, periodQuery, type PeriodValue } from "../components/charts";
 import { Alert, Card, EmptyState, ErrorText, Select, Spinner, Table, Td } from "../components/ui";
 import { DISK_TYPE, formatBytes, formatHours, formatNumber } from "../format";
@@ -16,6 +19,20 @@ function hours(seconds: number): string {
 export default function StatisticsPage() {
   const [period, setPeriod] = useState<PeriodValue>(() => periodFromPreset("7d"));
   const [metric, setMetric] = useState("temperature_c");
+  const [view, setView] = useState<"chart" | "gauges">(() => {
+    try {
+      return localStorage.getItem("sd-stats-view") === "gauges" ? "gauges" : "chart";
+    } catch {
+      return "chart";
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("sd-stats-view", view);
+    } catch {
+      /* lokalno skladište nije dostupno */
+    }
+  }, [view]);
   const [selected, setSelected] = useState<number[]>([]);
   // Disk zadržava svoju boju dok je izabran (boja prati disk, ne redosled); oslobođena boja ide sledećem.
   const [slots, setSlots] = useState<Record<number, number>>({});
@@ -84,8 +101,39 @@ export default function StatisticsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Statistika</h1>
-      <PeriodPicker value={period} onChange={setPeriod} />
+      <div className="flex flex-wrap items-end gap-2">
+        <PeriodPicker value={period} onChange={setPeriod} showBucket={view === "chart"} />
+        <div className="inline-flex rounded-lg border border-slate-300 bg-white p-0.5 dark:border-slate-600 dark:bg-slate-900" role="group" aria-label="Način prikaza">
+          {([["chart", "Grafikon", ChartLine], ["gauges", "Merači", Gauge]] as const).map(([key, label, Icon]) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={view === key}
+              onClick={() => setView(key)}
+              className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm ${view === key ? "bg-brand-700 font-medium text-white" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"}`}
+            >
+              <Icon className="size-4" aria-hidden /> {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
+      {view === "gauges" && (
+        <Card title="Merači po disku">
+          <div className="space-y-3">
+            <Select className="max-w-80" value={metric} onChange={(e) => setMetric(e.target.value)} aria-label="Metrika">
+              {Object.entries(catalog.data?.disk ?? {}).map(([key, m]) => (
+                <option key={key} value={key}>{m.label}</option>
+              ))}
+            </Select>
+            <DiskGauges disks={present} metric={metric} metricLabel={catalog.data?.disk[metric]?.label ?? metric} />
+          </div>
+        </Card>
+      )}
+
+      <PredictionsCard />
+
+      {view === "chart" && (
       <Card title="Poređenje diskova kroz vreme">
         <div className="grid gap-4 lg:grid-cols-[18rem_1fr]">
           <div className="space-y-3">
@@ -156,6 +204,7 @@ export default function StatisticsPage() {
           </div>
         </div>
       </Card>
+      )}
 
       {overview.isLoading && <Spinner />}
       {o && (

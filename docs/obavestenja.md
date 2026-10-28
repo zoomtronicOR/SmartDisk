@@ -64,6 +64,22 @@ Preduslov je HTTPS sa pouzdanim sertifikatom, tj. instaliran lokalni CA ([instal
 
 Obaveštenja stižu i kada aplikacija nije otvorena, dok god je pregledač pokrenut. Klik na obaveštenje otvara alarm. **Utišaj 8 h** privremeno zaustavlja obaveštenja za taj pregledač. Svaki pregledač ili uređaj ima svoju pretplatu. Ako je dozvola u pregledaču blokirana, menja se u podešavanjima sajta (ikona katanca u adresnoj traci).
 
+## Telegram, Pushover, webhook
+
+*Podešavanja → Dodatni kanali obaveštenja*. Svaki kanal se posebno uključuje, ima najniži nivo i dugme **Pošalji probu**.
+
+- **Telegram**: napraviti bota preko `@BotFather` (dobija se token) i poslati mu bilo koju poruku. Chat ID se dobija npr. od `@userinfobot` (za grupu: dodati bota u grupu).
+- **Pushover**: API token aplikacije (*Create an Application*) i korisnički ključ sa pushover.net. Kritični alarmi idu sa visokim prioritetom.
+- **Webhook**: POST sa JSON telom događaja na zadati URL. Uz tajnu se šalje zaglavlje `X-SmartDisk-Signature: sha256=<HMAC-SHA256 tela>`. Za Home Assistant: automatizacija sa okidačem *Webhook* (`http://<HA>:8123/api/webhook/<id>`), npr. za *persistent notification*.
+
+## Režim održavanja
+
+*Podešavanja → Režim održavanja*: za zadati broj sati šalju se samo kritična obaveštenja (npr. dok se menja disk ili traje scrub). Alarmi se i dalje beleže, a MQTT telemetrija radi. Preskočena obaveštenja se vide u evidenciji.
+
+## Zakazani izveštaji
+
+*Podešavanja → Zakazani izveštaji*: dnevni, nedeljni ili mesečni izveštaji (stanje uređaja, diskovi sa upozorenjima, SMART promene…) stižu kao PDF, XLSX ili CSV prilog e-pošte. Potreban je podešen SMTP. **Pošalji sada** služi za proveru.
+
 ## Alarmi: nivoi i ponašanje
 
 | Nivo | Značenje | Primer |

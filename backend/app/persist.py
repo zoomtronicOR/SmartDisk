@@ -67,9 +67,13 @@ async def save_disks(db: AsyncSession, device_id: int, run_id: int, result: Coll
             continue
         seen.add(ident)
         disk = existing.get(ident)
+        before = {"model": disk.model, "capacity_bytes": disk.capacity_bytes, "device_path": disk.device_path} if disk else None
         if disk is None:
             disk = Disk(device_id=device_id, stable_identifier=ident, first_seen_at=now, last_seen_at=now)
             db.add(disk)
+            new_disk = True
+        else:
+            new_disk = False
         for name in _DISK_FIELDS:
             value = getattr(reading, name)
             # „unknown” tip (npr. disk u standby-ju) ne briše tip koji je ranije pouzdano utvrđen.
@@ -105,6 +109,29 @@ async def save_disks(db: AsyncSession, device_id: int, run_id: int, result: Coll
         key = disk_key(reading.device_path)
         if key:
             by_key[key] = disk.id
+        name = f"{reading.device_path} ({reading.model or 'nepoznat model'})"
+        if new_disk and disks:  # prvi ciklus uređaja nije „promena”
+            previous = by_path.get(reading.device_path)
+            if previous is not None and previous.stable_identifier != ident and previous.is_present:
+                result.changes.append({"rule": "disk_replaced", "disk_id": disk.id,
+                                       "title": f"zamenjen disk na {reading.device_path}",
+                                       "message": f"Na putanji {reading.device_path} je sada drugi disk: {name}, "
+                                                  f"umesto {previous.model or '?'} (raniji identitet {previous.stable_identifier}). "
+                                                  "Istorija starog diska je sačuvana."})
+            else:
+                result.changes.append({"rule": "disk_added", "disk_id": disk.id, "title": f"nov disk {reading.device_path}",
+                                       "message": f"Pronađen je nov disk: {name}."})
+        elif before is not None:
+            diffs = []
+            if reading.model and before["model"] and reading.model != before["model"]:
+                diffs.append(f"model {before['model']} → {reading.model}")
+            if reading.capacity_bytes and before["capacity_bytes"] and reading.capacity_bytes != before["capacity_bytes"]:
+                diffs.append(f"kapacitet {before['capacity_bytes']} → {reading.capacity_bytes} B")
+            if before["device_path"] and before["device_path"] != reading.device_path:
+                diffs.append(f"putanja {before['device_path']} → {reading.device_path}")
+            if diffs:
+                result.changes.append({"rule": "disk_changed", "disk_id": disk.id, "title": f"promena diska {reading.device_path}",
+                                       "message": f"Disk {name} se promenio: {'; '.join(diffs)}."})
 
     if result.disks_complete:
         for ident, disk in existing.items():
@@ -130,6 +157,15 @@ async def save_pools(db: AsyncSession, device_id: int, result: CollectResult, di
         for name in _POOL_FIELDS:
             setattr(pool, name, _clip(getattr(reading, name), _MAX_BIGINT))
         pool.status = (reading.status or "?")[:64]
+        old_members = sorted(m.get("name") for m in (pool.members or []) if m.get("kind") == "disk")
+        new_members = sorted(m.name for m in reading.members if m.kind == "disk")
+        if pool.id is not None and old_members and new_members and old_members != new_members:
+            gone = sorted(set(old_members) - set(new_members))
+            added = sorted(set(new_members) - set(old_members))
+            result.changes.append({"rule": "pool_topology", "pool_id": pool.id, "title": f"promena sastava {pool.name}",
+                                   "message": f"Sastav {pool.name} se promenio."
+                                              + (f" Uklonjeni: {', '.join(gone)}." if gone else "")
+                                              + (f" Dodati: {', '.join(added)}." if added else "")})
         pool.members = [
             {**asdict(m), "disk_id": disk_ids.get(m.disk_path or "")} for m in reading.members
         ] or None

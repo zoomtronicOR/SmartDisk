@@ -26,22 +26,27 @@ class Notice:
     kind: str  # opened / escalated / reminder / resolved
 
 
-async def open_fingerprints(db: AsyncSession, device_id: int) -> set[str]:
-    rows = await db.scalars(select(Event.fingerprint).where(Event.device_id == device_id, Event.status.in_(("open", "acknowledged"))))
+async def open_fingerprints(db: AsyncSession, device_id: int | None) -> set[str]:
+    rows = await db.scalars(select(Event.fingerprint).where(_device(device_id), Event.status.in_(("open", "acknowledged"))))
     return set(rows)
+
+
+def _device(device_id: int | None):  # noqa: ANN202
+    """Alarmi uređaja, ili sistemski alarmi (bez uređaja, npr. NTP) kada je device_id None."""
+    return Event.device_id.is_(None) if device_id is None else Event.device_id == device_id
 
 
 def _history(db: AsyncSession, event: Event, action: str, username: str | None = None, comment: str | None = None) -> None:
     db.add(EventHistory(event_id=event.id, action=action, username=username, severity=event.severity, comment=comment))
 
 
-async def apply(db: AsyncSession, device_id: int, evaluation: Evaluation, th: dict) -> list[Notice]:
+async def apply(db: AsyncSession, device_id: int | None, evaluation: Evaluation, th: dict) -> list[Notice]:
     """Usklađuje alarme uređaja sa procenom. Commit radi pozivalac; obaveštenja se šalju posle commit-a."""
     now = utcnow()
     notices: list[Notice] = []
     current = {c.fingerprint: c for c in evaluation.conditions}
     events = list(await db.scalars(
-        select(Event).where(Event.device_id == device_id).where(
+        select(Event).where(_device(device_id)).where(
             (Event.status.in_(ACTIVE)) | (Event.resolved_at >= now - timedelta(minutes=th["cooldown_minutes"]))
         ).order_by(Event.id)
     ))

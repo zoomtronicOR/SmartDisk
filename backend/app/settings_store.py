@@ -10,12 +10,14 @@ from .models import AppSetting
 DEFAULT_INTERVAL = "collection.default_interval_minutes"
 TIMEZONE = "general.timezone"
 RAW_RETENTION_DAYS = "retention.raw_days"
+NTP_SERVER = "time.ntp_server"
 
 DEFAULTS: dict[str, Any] = {
     DEFAULT_INTERVAL: 15,
     TIMEZONE: DEFAULT_TIMEZONE,
     # Sirova merenja (disk_samples, pool_samples) čuvaju se 12 meseci.
     RAW_RETENTION_DAYS: 365,
+    NTP_SERVER: "pool.ntp.org",
 }
 
 

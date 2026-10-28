@@ -39,6 +39,7 @@ if ! id "$APP_USER" >/dev/null 2>&1; then
   useradd --system --home-dir "$DATA_DIR" --create-home --shell /usr/sbin/nologin "$APP_USER"
 fi
 install -d -o "$APP_USER" -g "$APP_USER" -m 750 "$DATA_DIR"
+install -d -o "$APP_USER" -g "$APP_USER" -m 700 "$DATA_DIR/backups"  # backup baze (spec. §16.5)
 
 log "PostgreSQL baza"
 systemctl enable --now postgresql >/dev/null
