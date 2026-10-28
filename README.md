@@ -41,7 +41,7 @@ Još snimaka i objašnjenje svakog ekrana: **[korisničko uputstvo](docs/korisni
 | Završetak | Korisničko uputstvo, dostupno i iz aplikacije (stavka **Pomoć**) | **Završeno** - [uputstvo](docs/korisnicko-uputstvo.md) |
 | 1.0.0 | Provera kanala obaveštenja sa stvarnim nalozima (Web Push, Home Assistant, SMTP) | sledeće |
 
-Verzije: svaka faza podiže manju verziju (0.N.0), ispravke poslednji broj (0.N.x). Izmene su po verzijama označene tagovima (`v0.5.0`, `v0.6.0`…).
+Verzije: svaka faza podiže manju verziju (0.N.0), ispravke poslednji broj (0.N.x). Izmene su po verzijama označene tagovima (`v0.5.0`, `v0.6.0`…), a posle 0.6.0 opisane u [dnevniku izmena](docs/izmene.md).
 
 ## Instalacija na LXC (u kratkim crtama)
 
@@ -59,6 +59,7 @@ Aplikacija je zatim dostupna na `https://<IP-kontejnera>`. Detalji su u [docs/in
 - [Dodavanje uređaja i SSH pristup](docs/dodavanje-uredjaja.md) (nalog `diskmonitor`, sudo profili po platformi)
 - [Obaveštenja: e-pošta, MQTT/Home Assistant, Web Push, Telegram, Pushover, webhook](docs/obavestenja.md)
 - [Arhitektura i tehničke odluke](docs/arhitektura.md)
+- [Dnevnik izmena](docs/izmene.md) (verzije posle 0.6.0)
 - Izveštaji o fazama: [1](docs/faza-1-izvestaj.md) · [2](docs/faza-2-izvestaj.md) · [3](docs/faza-3-izvestaj.md) · [4](docs/faza-4-izvestaj.md) · [5](docs/faza-5-izvestaj.md)
 - API dokumentacija (OpenAPI/Swagger): `https://<IP-kontejnera>/api/docs`
 
