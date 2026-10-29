@@ -2,6 +2,11 @@
 
 Izmene posle Faze 5 i korisničkog uputstva (0.6.0). Svaka verzija na GitHub-u ima tag `vX.Y.Z`. Šta je isporučeno u fazama opisuju [izveštaji faza](../README.md#stanje-razvoja).
 
+## 0.6.10 - 29.10.2026.
+
+- **Trake zauzeća u kartici Stanje aplikacije** (Podešavanja): disk kontejnera, memorija, procesor i baza podataka, sa procentom, oznakom stanja (U redu / Visoko / Kritično) i osvežavanjem na 10 sekundi.
+- `GET /api/system/status` vraća i `memory_total_bytes`, `memory_used_bytes`, `cpu_percent` i `cpu_cores`. Memorija se čita iz `/proc/meminfo` (u LXC-u granice kontejnera), a procesor iz cgroup `cpu.stat` u prozoru od 0,25 s. `loadavg` se ne koristi, jer u LXC-u prikazuje opterećenje celog Proxmox hosta.
+
 ## 0.6.9 - 29.10.2026.
 
 - **Brisanje svih uređaja** (Podešavanja → Brisanje svih uređaja), za premeštanje kontejnera u drugu mrežu. Potvrda lozinkom prijavljenog administratora; API tokenom nije dozvoljeno. Uređaji se brišu kao i pojedinačno (soft-delete, istorija diskova ostaje), uz brisanje njihovih privatnih ključeva i zatvaranje aktivnih alarma. U audit logu su `device.deleted_all` (broj i nazivi uređaja) i `device.delete_all_denied` (pogrešna lozinka).

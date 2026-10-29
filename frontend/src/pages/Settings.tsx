@@ -6,7 +6,7 @@ import AdvancedSettingsSection from "../components/AdvancedSettings";
 import BrandingCard from "../components/BrandingCard";
 import DeleteAllDevicesCard from "../components/DeleteAllDevicesCard";
 import NotificationSettingsSection from "../components/NotificationSettings";
-import { Alert, Button, Card, ErrorText, Field, Input, Select, Spinner } from "../components/ui";
+import { Alert, Badge, Button, Card, ErrorText, Field, Input, Select, Spinner } from "../components/ui";
 import { formatBytes, formatDateTime } from "../format";
 import type { SystemStatus } from "../types";
 
@@ -16,7 +16,7 @@ export default function SettingsPage() {
   const queryClient = useQueryClient();
   const collection = useQuery({ queryKey: ["settings", "collection"], queryFn: () => api<CollectionSettings>("/settings/collection") });
   const general = useQuery({ queryKey: ["settings", "general"], queryFn: () => api<{ timezone: string }>("/settings/general") });
-  const system = useQuery({ queryKey: ["system"], queryFn: () => api<SystemStatus>("/system/status", { background: true }) });
+  const system = useQuery({ queryKey: ["system"], queryFn: () => api<SystemStatus>("/system/status", { background: true }), refetchInterval: 10_000 });
 
   const [interval, setInterval] = useState(15);
   const [retention, setRetention] = useState(365);
@@ -116,15 +116,66 @@ export default function SettingsPage() {
             <dd>{system.data.collection_jobs}</dd>
             <dt className="text-slate-500">Poslednje uspešno prikupljanje</dt>
             <dd>{formatDateTime(system.data.last_successful_collection_at)}</dd>
-            <dt className="text-slate-500">Veličina baze</dt>
-            <dd>{formatBytes(system.data.database_size_bytes)}</dd>
-            <dt className="text-slate-500">Slobodan prostor (LXC)</dt>
-            <dd>
-              {formatBytes(system.data.disk_free_bytes)} od {formatBytes(system.data.disk_total_bytes)}
-            </dd>
           </dl>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Meter
+              label="Disk kontejnera"
+              percent={pct(system.data.disk_total_bytes - system.data.disk_free_bytes, system.data.disk_total_bytes)}
+              detail={`${formatBytes(system.data.disk_total_bytes - system.data.disk_free_bytes)} od ${formatBytes(system.data.disk_total_bytes)} (slobodno ${formatBytes(system.data.disk_free_bytes)})`}
+            />
+            <Meter
+              label="Memorija"
+              percent={pct(system.data.memory_used_bytes, system.data.memory_total_bytes)}
+              detail={system.data.memory_total_bytes ? `${formatBytes(system.data.memory_used_bytes)} od ${formatBytes(system.data.memory_total_bytes)}` : "nije dostupno"}
+            />
+            <Meter
+              label="Procesor"
+              percent={system.data.cpu_percent}
+              detail={system.data.cpu_percent != null ? `trenutno opterećenje, ${system.data.cpu_cores ?? "?"} jezgra` : "nije dostupno"}
+              warning={80}
+              critical={95}
+            />
+            <Meter
+              label="Baza podataka"
+              percent={pct(system.data.database_size_bytes, system.data.disk_total_bytes)}
+              detail={`${formatBytes(system.data.database_size_bytes)} (udeo u disku kontejnera)`}
+            />
+          </div>
         </Card>
       )}
+    </div>
+  );
+}
+
+function pct(used: number | null | undefined, total: number | null | undefined): number | null {
+  return used != null && total ? Math.round((used / total) * 1000) / 10 : null;
+}
+
+/** Zauzeće kao traka; nivo se prikazuje i bojom i oznakom sa ikonom. */
+function Meter({ label, percent, detail, warning = 80, critical = 90 }: { label: string; percent: number | null; detail: string; warning?: number; critical?: number }) {
+  const tone = percent == null ? "unknown" : percent >= critical ? "critical" : percent >= warning ? "warning" : "ok";
+  const bar = { ok: "bg-emerald-500", warning: "bg-amber-500", critical: "bg-red-600", unknown: "bg-slate-400" }[tone];
+  const text = { ok: "U redu", warning: "Visoko", critical: "Kritično", unknown: "Nema podataka" }[tone];
+  return (
+    <div className="space-y-1.5 text-sm">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-medium">{label}</span>
+        <span className="flex items-center gap-2">
+          <span className="tabular-nums">{percent != null ? `${percent.toLocaleString("sr-Latn-RS")}%` : "-"}</span>
+          <Badge tone={tone}>{text}</Badge>
+        </span>
+      </div>
+      <div
+        className="h-2.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent ?? undefined}
+      >
+        <div className={`h-full rounded-full transition-[width] duration-500 ${bar}`} style={{ width: `${Math.min(100, Math.max(percent ?? 0, percent ? 1 : 0))}%` }} />
+      </div>
+      <p className="text-xs text-slate-500">{detail}</p>
     </div>
   );
 }

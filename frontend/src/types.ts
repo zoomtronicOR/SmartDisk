@@ -112,6 +112,10 @@ export type SystemStatus = {
   database_size_bytes: number;
   disk_total_bytes: number;
   disk_free_bytes: number;
+  memory_total_bytes: number | null;
+  memory_used_bytes: number | null;
+  cpu_percent: number | null;
+  cpu_cores: number | null;
   last_successful_collection_at: string | null;
 };
 

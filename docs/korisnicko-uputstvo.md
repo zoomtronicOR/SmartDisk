@@ -555,7 +555,7 @@ Tehnički detalji (tačni sudo profili, šta je provereno na kojoj verziji) su u
 | **Zakazani izveštaji** | automatsko slanje izveštaja e-poštom; **Pošalji sada** za proveru |
 | **Backup baze** | svakodnevni backup u izabrani sat, broj čuvanih kopija, **Napravi backup sada**. Backup ne sadrži glavni ključ aplikacije, koji administrator čuva odvojeno |
 | **Brisanje svih uređaja** | uklanja sve uređaje odjednom, uz potvrdu vašom lozinkom (videti [poglavlje 11](#premeštanje-u-drugu-mrežu-brisanje-svih-uređaja)) |
-| **Stanje aplikacije** | verzija, rad scheduler-a, veličina baze, slobodan prostor |
+| **Stanje aplikacije** | verzija, rad scheduler-a, poslednje prikupljanje i trake zauzeća: disk kontejnera, memorija, procesor i baza podataka. Traka je zelena („U redu”), od 80% žuta („Visoko”), a od 90% crvena („Kritično”); za procesor su granice 80% i 95%. Vrednosti se osvežavaju na 10 sekundi |
 
 **Audit log** (meni) beleži svaku važnu radnju: prijave, izmene uređaja, korisnika i podešavanja, potvrde alarma, backup.
 

@@ -1,6 +1,9 @@
 """Podešavanja, pregled (dashboard), audit log, zdravlje aplikacije."""
 
+import asyncio
+import os
 import shutil
+import time
 from datetime import UTC, datetime
 from typing import Any
 
@@ -43,10 +46,51 @@ async def meta(_: User = Depends(current_user)) -> dict[str, Any]:
     return {"version": __version__, "platforms": PLATFORMS, "roles": ROLES}
 
 
+def _memory() -> tuple[int, int] | None:
+    """(ukupno, iskorišćeno) u bajtovima. U LXC-u /proc/meminfo prikazuje granice kontejnera (lxcfs)."""
+    try:
+        info = {}
+        with open("/proc/meminfo") as f:
+            for line in f:
+                key, _, rest = line.partition(":")
+                info[key] = int(rest.split()[0]) * 1024
+        return info["MemTotal"], info["MemTotal"] - info["MemAvailable"]
+    except (OSError, KeyError, ValueError, IndexError):
+        return None
+
+
+def _cpu_usage_usec() -> int | None:
+    try:
+        with open("/sys/fs/cgroup/cpu.stat") as f:
+            for line in f:
+                if line.startswith("usage_usec "):
+                    return int(line.split()[1])
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+async def _cpu_percent(window: float = 0.25) -> float | None:
+    """Opterećenje procesora kontejnera (cgroup v2) u kratkom prozoru, u odnosu na broj dostupnih jezgara.
+
+    loadavg se ne koristi: u LXC-u prikazuje opterećenje celog Proxmox hosta.
+    """
+    start, t0 = _cpu_usage_usec(), time.monotonic()
+    if start is None:
+        return None
+    await asyncio.sleep(window)
+    end, t1 = _cpu_usage_usec(), time.monotonic()
+    if end is None:
+        return None
+    cores = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
+    return round(min(100.0, (end - start) / ((t1 - t0) * 1_000_000 * cores) * 100), 1)
+
+
 @router.get("/system/status")
 async def system_status(_: User = Depends(current_user), db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     db_size = await db.scalar(text("SELECT pg_database_size(current_database())"))
     disk = shutil.disk_usage("/")
+    memory = _memory()
     last_success = await db.scalar(
         select(func.max(CollectionRun.finished_at)).where(CollectionRun.status.in_(("success", "partial")))
     )
@@ -59,6 +103,10 @@ async def system_status(_: User = Depends(current_user), db: AsyncSession = Depe
         "database_size_bytes": db_size,
         "disk_total_bytes": disk.total,
         "disk_free_bytes": disk.free,
+        "memory_total_bytes": memory[0] if memory else None,
+        "memory_used_bytes": memory[1] if memory else None,
+        "cpu_percent": await _cpu_percent(),
+        "cpu_cores": len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count(),
         "last_successful_collection_at": last_success,
         "mqtt": _mqtt_status(),
         "time": _time_status(),
