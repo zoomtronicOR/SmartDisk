@@ -1,6 +1,6 @@
 # Dodavanje uređaja i SSH pristup
 
-Aplikacija se na uređaj prijavljuje **namenskim nalogom samo za nadzor** (`diskmonitor`), isključivo SSH ključem. Nalog sme da izvrši samo tačno određene read-only komande (spec. §5.3). Profili u ovom dokumentu su provereni na Proxmox VE 9.2 i TrueNAS CORE 13.0. TrueNAS SCALE i Synology DSM još nisu provereni na stvarnom uređaju (videti [izveštaj o Fazi 2](faza-2-izvestaj.md)).
+Aplikacija se na uređaj prijavljuje **namenskim nalogom samo za nadzor** (`diskmonitor`), isključivo SSH ključem. Nalog sme da izvrši samo tačno određene read-only komande (spec. §5.3). Profili u ovom dokumentu su provereni na Proxmox VE 9.2, TrueNAS CORE 13.0 i TrueNAS SCALE 27.0. Synology DSM još nije proveren na stvarnom uređaju (videti [izveštaj o Fazi 2](faza-2-izvestaj.md)).
 
 Tačan spisak komandi i gotov sudoers fajl za svaku platformu prikazuje i sama aplikacija: stranica uređaja → **Profil privilegija za nalog na uređaju** (dugme *Kopiraj*). Spisak se pravi iz istih šablona po kojima aplikacija izvršava komande.
 
@@ -87,7 +87,32 @@ Profil dozvoljava `smartctl` za `/dev/ada*`, `/dev/da*` i `/dev/nvme*` sa tipovi
 
 ## TrueNAS SCALE
 
-Netestirano (uređaj je bio u resilver-u tokom Faze 2). Očekivani postupak je isti kao na CORE-u, kroz web interfejs: *Credentials → Users → Add*, home na pool-u, *Allowed sudo commands with no password* sa komandama iz aplikacije (Linux putanje `/usr/sbin/smartctl`, uređaji `/dev/sd*` i `/dev/nvme*`). Na novijim verzijama SCALE-a root nalog je zaključan, a administratorski nalog je `truenas_admin`.
+Provereno na TrueNAS SCALE 27.0.0-RC.1 (192.168.88.47). Kao i na CORE-u, TrueNAS sam generiše sudoers i nalog, pa se sve podešava **kroz middleware** ili web interfejs (*Credentials → Users*), ne ručnom izmenom fajlova. Na novijim verzijama root nalog je zaključan, pa se komande pokreću kao administrator (`admin` ili `truenas_admin`) uz `sudo`.
+
+Razlike u odnosu na CORE:
+
+- sudo komande bez lozinke idu u polje `sudo_commands_nopasswd` (polja `sudo` i `sudo_nopasswd` ne postoje);
+- nalog bez lozinke mora imati isključen SMB (`"smb": false`), inače ga TrueNAS odbija;
+- `home` je pool (npr. `/mnt/datapool`), a uz `"home_create": true` TrueNAS sam pravi `/mnt/datapool/diskmonitor`. Bez home direktorijuma na pool-u (podrazumevano `/var/empty`) SSH ključ ne može da se sačuva;
+- shell `/usr/bin/bash`; `uid` nije potreban.
+
+Naziv pool-a: `zpool list -Ho name` (ne `boot-pool`). Zatim, uz pravi naziv pool-a i javni ključ iz aplikacije:
+
+```bash
+POOL=datapool
+sudo midclt call user.create '{"username":"diskmonitor","full_name":"SmartDisk nadzor (read-only)",
+  "group_create":true,"password_disabled":true,"smb":false,"ssh_password_enabled":false,
+  "home":"/mnt/'"$POOL"'","home_create":true,"shell":"/usr/bin/bash",
+  "sudo_commands_nopasswd":["/usr/sbin/smartctl -j --scan-open", "…"],
+  "sshpubkey":"from=\"192.168.88.246\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA… smartdisk-4"}'
+```
+
+Spisak `sudo_commands_nopasswd` je tačno spisak koji aplikacija prikazuje za SCALE (11 `smartctl` komandi za `/dev/sd*` i `/dev/nvme*`). `zpool` i `lsblk` rade bez sudo-a. Komanda vraća ceo zapis novog naloga; proveriti `home`, `smb: false` i spisak komandi. Provera da nalog postoji: `sudo midclt call user.query '[["username","=","diskmonitor"]]'`.
+
+Napomene iz prakse (27.0.0-RC.1):
+
+- javni ključ se ne lepi u terminal (to je samo tekst, ne komanda), nego u polje naloga ili u `sshpubkey`;
+- `/etc/version` na SCALE 27 nema završni prelom reda. Aplikacija od verzije 0.6.7 to podnosi; starije verzije su prijavljivale „smartctl nije pronađen”.
 
 ## Synology DSM
 

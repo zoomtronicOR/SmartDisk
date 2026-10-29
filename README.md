@@ -2,7 +2,7 @@
 
 Web aplikacija za centralizovani nadzor diskova, SMART podataka i zdravlja skladišta na TrueNAS, Proxmox VE i Synology sistemima. Radi u Debian 13 LXC kontejneru na Proxmoxu. Ceo interfejs je na srpskom (latinica).
 
-**Trenutna verzija: 0.6.6**
+**Trenutna verzija: 0.6.7**
 
 ![Pregled](docs/uputstvo-slike/01-pregled.jpg)
 
@@ -34,7 +34,7 @@ Još snimaka i objašnjenje svakog ekrana: **[korisničko uputstvo](docs/korisni
 | Faza | Sadržaj | Stanje |
 |---|---|---|
 | 1 - Osnova | LXC instalacija, backend, frontend, PostgreSQL, prijava i korisnici, upravljanje uređajima, SSH test, scheduler sa dinamičkim intervalima | **Završeno** - [izveštaj](docs/faza-1-izvestaj.md) |
-| 2 - Prikupljanje | Adapteri za TrueNAS/Proxmox/Synology, inventar diskova, SMART/NVMe, ZFS/RAID | **Završeno** (SCALE i Synology čekaju proveru na uređaju) - [izveštaj](docs/faza-2-izvestaj.md) |
+| 2 - Prikupljanje | Adapteri za TrueNAS/Proxmox/Synology, inventar diskova, SMART/NVMe, ZFS/RAID | **Završeno** (Synology čeka proveru na uređaju; SCALE proveren u 0.6.7) - [izveštaj](docs/faza-2-izvestaj.md) |
 | 3 - Dashboard i analitika | Grafikoni, statistika, izvoz | **Završeno** - [izveštaj](docs/faza-3-izvestaj.md) |
 | 4 - Degradacija i alarmi | Zdravlje diska, trendovi, alarmi, MQTT, Home Assistant, Web Push, e-pošta | **Završeno** - [izveštaj](docs/faza-4-izvestaj.md) |
 | 5 - Napredno | Poređenje, mapa skladišta, prognoze, promene inventara, zakazani izveštaji, Telegram/Pushover/webhook, API tokeni, backup, NTP i sat, merači | **Završeno** - [izveštaj](docs/faza-5-izvestaj.md) |

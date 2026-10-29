@@ -10,7 +10,7 @@
 |---|---|---|
 | Proxmox adapter | ✓ provereno na 2 hosta (PVE 9.2.21) | `adapters/platforms.py: collect_linux` |
 | TrueNAS CORE adapter | ✓ provereno (TrueNAS-13.0-U6.8) | `collect_truenas_core` |
-| TrueNAS SCALE adapter | napisan, **nije proveren** (uređaj je u resilver-u) | `collect_linux` |
+| TrueNAS SCALE adapter | napisan; proveren kasnije, u 0.6.7, na SCALE 27.0.0-RC.1 (videti [dnevnik izmena](izmene.md)) | `collect_linux` |
 | Synology adapter | napisan, **nije proveren** (nema uređaja); JSON i tekstualni smartctl | `collect_synology` |
 | Inventar diskova | ✓ stabilan identitet (WWN/EUI/serijski broj), praćenje putanje, nestali diskovi, diskovi koje smartctl ne vidi | `persist.py`, tabela `disks` |
 | SMART (SATA/SAS) | ✓ overall-health, ključni brojači, svi atributi (value/worst/thresh/raw), log grešaka, self-testovi | `adapters/smart.py` |

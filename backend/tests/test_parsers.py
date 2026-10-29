@@ -239,3 +239,26 @@ def test_collect_proxmox_end_to_end():
     assert result.errors == []
     assert "sudo -n /usr/sbin/smartctl -j -a -n standby -d sat /dev/sda" in commands
     assert all(not c.startswith("sudo") for c in commands if "lsblk" in c)
+
+
+def test_probe_scale_version_without_newline():
+    """TrueNAS SCALE 27: /etc/version nema završni prelom reda, pa se oznaka sledeće sekcije lepi za verziju."""
+    from app.ssh.probe import parse_probe
+
+    output = (
+        "@@uname\nLinux 6.12.33-production+truenas x86_64\n"
+        '@@os_release\nPRETTY_NAME="Debian GNU/Linux 13 (trixie)"\nID=debian\n'
+        "@@synology\n@@freebsd\n@@pve\n"
+        "@@truenas\nTrueNAS SCALE 27.0.0-RC.1@@tools\n"
+        "smartctl=/usr/sbin/smartctl\nlsblk=/usr/bin/lsblk\nnvme=\nzpool=/usr/sbin/zpool\nzfs=/usr/sbin/zfs\n"
+        "mdadm=\nlvs=\nvgs=\npvesm=\nmidclt=/usr/bin/midclt\nsynodisk=\n"
+        "@@smartctl\nsmartctl 7.4 2023-08-01 r5530 [x86_64-linux-6.12.33-production+truenas] (local build)\n"
+        "@@epoch\n1793229600\n"
+    )
+    probe = parse_probe(output, "truenas_scale")
+    assert probe.detected_platform == "truenas_scale"
+    assert "@@" not in probe.os_info
+    assert probe.tools["smartctl"] == "/usr/sbin/smartctl"
+    assert probe.tools["zpool"] == "/usr/sbin/zpool"
+    assert probe.tools["nvme"] is None
+    assert probe.device_epoch == 1793229600

@@ -57,16 +57,15 @@ class ProbeResult:
     device_epoch: int | None = None  # sat uređaja (Unix vreme) u trenutku izvršavanja
 
 
+_SECTIONS = re.findall(r'echo "@@(\w+)"', _SCRIPT)
+# Oznaka može da se nađe i na kraju reda: fajl bez završnog preloma reda (npr. /etc/version na
+# TrueNAS SCALE 27) se lepi za sledeći `echo "@@…"`. Zato se deli po poznatim oznakama, ne po redovima.
+_MARKER = re.compile(r"@@(" + "|".join(_SECTIONS) + r")\r?\n")
+
+
 def _sections(output: str) -> dict[str, str]:
-    sections: dict[str, list[str]] = {}
-    current = None
-    for line in output.splitlines():
-        if line.startswith("@@"):
-            current = line[2:].strip()
-            sections[current] = []
-        elif current is not None:
-            sections[current].append(line)
-    return {k: "\n".join(v).strip() for k, v in sections.items()}
+    parts = _MARKER.split(output)
+    return {parts[i]: parts[i + 1].strip() for i in range(1, len(parts) - 1, 2)}
 
 
 def _kv(text: str) -> dict[str, str]:

@@ -2,6 +2,11 @@
 
 Izmene posle Faze 5 i korisničkog uputstva (0.6.0). Svaka verzija na GitHub-u ima tag `vX.Y.Z`. Šta je isporučeno u fazama opisuju [izveštaji faza](../README.md#stanje-razvoja).
 
+## 0.6.7 - 29.10.2026.
+
+- **TrueNAS SCALE proveren na stvarnom uređaju** (27.0.0-RC.1): 6 diskova sa SMART podacima, pool-ovi `datapool` (RAIDZ1) i `boot-pool`, stanje scrub-a i resilver-a. Postupak za nalog `diskmonitor` preko `midclt` je u [dodavanje-uredjaja.md](dodavanje-uredjaja.md#truenas-scale).
+- **Ispravka:** na SCALE 27 `/etc/version` nema završni prelom reda, pa se oznaka sledeće sekcije zalepila za verziju sistema. Aplikacija tada nije videla nijedan alat i javljala je „smartctl nije pronađen”. Detekcija sistema sada deli izlaz po poznatim oznakama, a ne po redovima (`app/ssh/probe.py`), uz novi test.
+
 ## 0.6.6 - 29.10.2026.
 
 - **Skrivena šala:** posle 5 uzastopnih klikova na sat u zaglavlju, sat se 30 sekundi prikazuje preko celog ekrana, sa natpisom „HOĆEŠ DA KLIKĆEŠ, EVO TI SAD!” iznad. Ne može se zatvoriti ranije. Prikazuje se kroz portal u `body`, jer zaglavlje ograničava `fixed` elemente.
@@ -35,6 +40,6 @@ Skrivene šale namerno nisu opisane u korisničkom uputstvu.
 ## Otvoreno za 1.0.0
 
 - Provera kanala obaveštenja sa stvarnim nalozima: Web Push (korisnik odobrava u pregledaču), Home Assistant MQTT, SMTP. Po mogućstvu i Telegram, Pushover i webhook.
-- TrueNAS SCALE na stvarnom uređaju, posle završetka resilver-a. Synology nije proveren, jer uređaj nije dostupan.
+- Synology nije proveren, jer uređaj nije dostupan.
 - Ukloniti privremeni root ključ `claude-smartdisk-setup` sa nadziranih uređaja.
 - Posle postavljanja pravog logotipa osvežiti snimke ekrana u uputstvu i README-u.
