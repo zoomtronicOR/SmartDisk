@@ -2,6 +2,14 @@
 
 Izmene posle Faze 5 i korisničkog uputstva (0.6.0). Svaka verzija na GitHub-u ima tag `vX.Y.Z`. Šta je isporučeno u fazama opisuju [izveštaji faza](../README.md#stanje-razvoja).
 
+## 0.6.11 - 29.10.2026.
+
+Samo dokumentacija (uputstvo se vidi i u aplikaciji, na stranici Pomoć):
+
+- `docs/instalacija.md`: novi odeljak **Premeštanje u drugu mrežu** (HTTPS sertifikat za novu adresu, master ključ, brisanje starih i dodavanje novih uređaja, adresa aplikacije, Web Push, kanali obaveštenja).
+- Korisničko uputstvo, poglavlje 11: adresa SmartDisk-a u `from="…"` ograničenju ključa mora biti stvarna adresa, a posle premeštanja nova; veza ka postupku premeštanja.
+- `docs/arhitektura.md`: parsiranje detekcije sistema po oznakama, brisanje svih uređaja, merenje memorije i procesora u LXC-u, stranica Pomoć sa kopiranjem komandi, skrivene šale.
+
 ## 0.6.10 - 29.10.2026.
 
 - **Trake zauzeća u kartici Stanje aplikacije** (Podešavanja): disk kontejnera, memorija, procesor i baza podataka, sa procentom, oznakom stanja (U redu / Visoko / Kritično) i osvežavanjem na 10 sekundi.

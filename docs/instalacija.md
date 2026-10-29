@@ -158,6 +158,22 @@ systemctl start smartdisk-api
 
 Na novom kontejneru: prvo `install.sh` (pravi bazu i korisnika), zatim vratiti **isti** `/etc/smartdisk/smartdisk.env` iz rezervne kopije, pa izvršiti korake iznad. Probno vraćanje bez diranja produkcije: `createdb smartdisk_restore_test`, `pg_restore` u nju, provera broja redova, pa `dropdb`.
 
+## Premeštanje u drugu mrežu
+
+Kada se kontejner premesti (Proxmox backup/restore celog LXC-a, migracija) u mrežu sa drugom adresom:
+
+1. **Adresa i HTTPS.** Caddy sertifikat važi za IP adresu koju `install.sh` pročita sa `hostname -I`. Posle promene adrese ponovo pokrenuti instalaciju, koja regeneriše `/etc/caddy/Caddyfile` za novu adresu:
+   ```bash
+   bash /opt/smartdisk/deploy/install.sh        # na kontejneru, kao root
+   ```
+   ili sa razvojne mašine `bash deploy/deploy.sh` (posle izmene adrese u SSH aliasu `smartdisk-lxc`). Ako je vraćen ceo LXC, lokalni Caddy CA je isti i root sertifikat na računarima ne treba ponovo instalirati. Na potpuno novom kontejneru CA je nov, pa root sertifikat treba ponovo preuzeti i instalirati (odeljak *HTTPS sertifikat*).
+2. **Master ključ.** Ako se baza vraća na nov kontejner, vratiti i isti `/etc/smartdisk/smartdisk.env` (odeljak *Backup i vraćanje*).
+3. **Stari uređaji.** *Podešavanja → Brisanje svih uređaja* (potvrda lozinkom). Istorija diskova ostaje.
+4. **Novi uređaji** po korisničkom uputstvu, poglavlje 11. U `from="…"` ograničenju ključa upisati **novu** adresu SmartDisk-a.
+5. **Adresa aplikacije** za linkove u obaveštenjima: *Podešavanja → Opšte za obaveštenja*.
+6. **Web Push** je vezan za adresu stranice: korisnici ponovo uključuju obaveštenja u *Moj nalog* na novoj adresi.
+7. Ako su korišćeni MQTT/Home Assistant, SMTP ili webhook, proveriti da su dostupni iz nove mreže (dugmad za probu u Podešavanjima).
+
 ## Vreme (NTP)
 
 Kontejner je unprivileged i koristi sat Proxmox hosta, pa se vreme podešava NTP-om **na hostu** (na Proxmox VE 9 radi `chrony`). Aplikacija na svakih 15 minuta proverava `timedatectl` i odstupanje od NTP servera (podrazumevano `pool.ntp.org`, menja se u *Podešavanja → Vreme i NTP*). Ako je odstupanje preko 2 s, otvara se upozorenje, a preko 30 s kritičan alarm. Datum i vreme servera stalno se vide u zaglavlju aplikacije.

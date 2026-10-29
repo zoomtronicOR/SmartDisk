@@ -284,7 +284,8 @@ Pripremite:
 
 - **IP adresu servera** (npr. `192.168.88.47`) i SSH port (obično `22`);
 - **pristup serveru** kao administrator: konzola (*Shell* u web interfejsu TrueNAS-a ili Proxmox-a) ili SSH;
-- za TrueNAS: **naziv pool-a** na kome će biti home direktorijum naloga (videti korak 3).
+- za TrueNAS: **naziv pool-a** na kome će biti home direktorijum naloga (videti korak 3);
+- **adresu SmartDisk-a** (ona koju kucate u pregledaču, npr. `192.168.88.246`). U komandama u ovom poglavlju piše `192.168.88.246`; ako je vaš SmartDisk na drugoj adresi, svuda je zamenite svojom.
 
 Na serveru mora da radi SSH servis:
 
@@ -522,7 +523,9 @@ Kada se SmartDisk kontejner premesti ili vrati iz backup-a u drugu mrežu, stari
 
 1. **Podešavanja → Brisanje svih uređaja → Obriši sve uređaje**.
 2. Prozor prikazuje koliko će uređaja biti obrisano i šta se dešava. Upišite **svoju lozinku** (lozinku naloga kojim ste prijavljeni) i potvrdite.
-3. Zatim dodajte uređaje iz nove mreže, od [koraka 1](#korak-1-dodajte-uređaj-u-aplikaciji).
+3. Zatim dodajte uređaje iz nove mreže, od [koraka 1](#korak-1-dodajte-uređaj-u-aplikaciji). Ako je SmartDisk u novoj mreži dobio drugu adresu, u `from="…"` ograničenju ključa upišite **novu** adresu.
+
+Ostale korake pri premeštanju (HTTPS sertifikat za novu adresu, adresa aplikacije u obaveštenjima, ponovno uključivanje obaveštenja u pregledaču) radi administrator servera; opisani su u `docs/instalacija.md`, odeljak *Premeštanje u drugu mrežu*.
 
 Šta se tačno dešava:
 

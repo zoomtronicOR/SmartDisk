@@ -79,7 +79,7 @@ Sva vremena se čuvaju kao `timestamptz` u UTC-u. Frontend ih prikazuje u vremen
 Jedna SSH konekcija po ciklusu:
 
 1. provera potvrđenog host ključa;
-2. detekcija sistema i alata (`ssh/probe.py`), jedna komanda kroz `sh -c`, jer korisnički shell može biti csh/zsh;
+2. detekcija sistema i alata (`ssh/probe.py`), jedna komanda kroz `sh -c`, jer korisnički shell može biti csh/zsh. Izlaz je podeljen oznakama `@@<sekcija>`, a parser deli po poznatim oznakama, ne po redovima: fajl bez završnog preloma reda (npr. `/etc/version` na TrueNAS SCALE 27) inače bi „progutao” oznaku sledeće sekcije;
 3. platformski adapter (`adapters/platforms.py`), samo za planirano i ručno prikupljanje (test konekcije staje na koraku 2):
 
 | Platforma | Diskovi | Skladište |
@@ -189,13 +189,14 @@ POST   /api/users/{id}/unlock          POST /api/users/{id}/logout-all
 GET    /api/devices                    POST /api/devices
 GET    /api/devices/{id}               PUT  /api/devices/{id}
 DELETE /api/devices/{id}               (soft-delete, istorija ostaje)
+POST   /api/devices/delete-all         (svi uređaji; lozinka administratora, samo sesija, ne API token)
 POST   /api/devices/{id}/generate-key  POST /api/devices/{id}/credentials
 POST   /api/devices/{id}/host-key/fetch
 POST   /api/devices/{id}/host-key/confirm
 POST   /api/devices/{id}/test-connection
 POST   /api/devices/{id}/collect       GET  /api/devices/{id}/runs
 
-GET    /api/dashboard/summary          GET  /api/system/status
+GET    /api/dashboard/summary          GET  /api/system/status   (+ disk, memorija, CPU kontejnera)
 GET    /api/settings/collection        PUT  /api/settings/collection
 GET    /api/settings/general           PUT  /api/settings/general
 GET    /api/audit                      GET  /api/meta
@@ -253,3 +254,7 @@ Greške se vraćaju kao `{"detail": "<poruka na srpskom>"}`. I greške validacij
 - Svetla i tamna tema (podrazumevano prema sistemu, izbor se pamti u pregledaču). Prilagođeno mobilnom ekranu.
 - Status se uvek prikazuje bojom, ikonom **i** tekstom (spec. §10.1).
 - Pregled i lista uređaja se osvežavaju na 15 s, a detalj uređaja na 10 s.
+- Pomoć (`pages/Help.tsx`) prikazuje `docs/korisnicko-uputstvo.md` (isti fajl kao na GitHub-u). Naslovi dobijaju isti „slug” kao na GitHub-u, pa veze unutar uputstva rade na oba mesta; svaki blok koda ima dugme **Kopiraj**.
+- Stanje aplikacije (Podešavanja): trake zauzeća za disk, memoriju, procesor i bazu. Memorija se čita iz `/proc/meminfo` (u LXC-u lxcfs prikazuje granice kontejnera), procesor iz cgroup v2 `cpu.stat` (razlika `usage_usec` u prozoru od 0,25 s, podeljena brojem dostupnih jezgara). `loadavg` se ne koristi, jer u LXC-u pokazuje ceo Proxmox host.
+- Brisanje svih uređaja (Podešavanja): isti soft-delete kao pojedinačno, uz brisanje šifrovanih privatnih ključeva i zatvaranje aktivnih alarma tih uređaja (istorija alarma dobija komentar). Audit: `device.deleted_all` i `device.delete_all_denied`.
+- Skrivene šale: 5 uzastopnih klikova (razmak najviše 1,5 s, `components/clickBurst.ts`) na naslov „SmartDisk” prikazuje ljutog smajlija 5 minuta (`localStorage` `sd-angry`), a na sat uvećan sat preko ekrana 30 s (portal u `body`, jer zaglavlje ograničava `fixed` elemente).
