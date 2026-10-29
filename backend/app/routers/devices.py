@@ -2,6 +2,7 @@ import asyncio
 
 import asyncssh
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,8 +10,8 @@ from .. import collector, crypto, scheduler, settings_store
 from ..audit import audit
 from ..constants import PLATFORMS
 from ..db import get_db
-from ..deps import admin_only, current_user, operator_or_admin
-from ..models import CollectionRun, Device, User, utcnow
+from ..deps import admin_only, current_user, operator_or_admin, session_user
+from ..models import CollectionRun, Device, Event, EventHistory, User, utcnow
 from ..schemas import (
     CapabilityOut,
     CredentialsIn,
@@ -24,6 +25,7 @@ from ..schemas import (
     RunOut,
     TestResultOut,
 )
+from ..security import verify_password
 from ..ssh.client import SSHError, fetch_host_key, load_private_key
 
 router = APIRouter(prefix="/api/devices", tags=["devices"])
@@ -197,6 +199,57 @@ async def update_device(
     await db.refresh(device)
     await _resync(db, device)
     return to_out(device, await _default_interval(db))
+
+
+class DeleteAllIn(BaseModel):
+    password: str = Field(min_length=1, max_length=256)
+
+
+@router.post("/delete-all")
+async def delete_all_devices(
+    body: DeleteAllIn,
+    request: Request,
+    admin: User = Depends(admin_only),
+    _: User = Depends(session_user),  # samo prijavljen administrator, ne API token
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, int]:
+    """Uklanja sve uređaje (npr. posle premeštanja kontejnera u drugu mrežu). Potvrda lozinkom administratora.
+
+    Soft-delete kao kod pojedinačnog brisanja: istorija diskova ostaje. Privatni ključevi obrisanih uređaja
+    se brišu, a njihovi aktivni alarmi se zatvaraju, jer se uređaji više ne kontaktiraju.
+    """
+    admin_name = admin.username
+    if not verify_password(admin.password_hash, body.password):
+        audit(db, request, admin, "device.delete_all_denied", "device", None, {"reason": "pogrešna lozinka"})
+        await db.commit()
+        raise HTTPException(403, "Lozinka nije ispravna. Uređaji nisu obrisani.")
+
+    devices = list(await db.scalars(select(Device).where(Device.deleted_at.is_(None))))
+    now = utcnow()
+    names = [d.name for d in devices]
+    ids = [d.id for d in devices]
+    for device in devices:
+        device.deleted_at = now
+        device.enabled = False
+        device.encrypted_private_key = None
+        device.encrypted_passphrase = None
+    resolved = 0
+    if ids:
+        events = await db.scalars(select(Event).where(Event.device_id.in_(ids), Event.status.in_(("open", "acknowledged"))))
+        for event in events:
+            event.status = "resolved"
+            event.resolved_at = now
+            event.resolved_by = admin_name
+            db.add(EventHistory(event_id=event.id, action="resolved", username=admin_name, severity=event.severity,
+                                comment="Zatvoren jer su obrisani svi uređaji."))
+            resolved += 1
+    audit(db, request, admin, "device.deleted_all", "device", None,
+          {"count": len(ids), "devices": names, "alarms_resolved": resolved})
+    await db.commit()
+    default_interval = await _default_interval(db)
+    for device in devices:
+        scheduler.sync_device(device, default_interval)
+    return {"deleted": len(ids), "alarms_resolved": resolved}
 
 
 @router.delete("/{device_id}", status_code=204)

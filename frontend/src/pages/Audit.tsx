@@ -23,6 +23,8 @@ const ACTION_LABELS: Record<string, string> = {
   "device.created": "Dodat uređaj",
   "device.updated": "Izmenjen uređaj",
   "device.deleted": "Obrisan uređaj",
+  "device.deleted_all": "Obrisani svi uređaji",
+  "device.delete_all_denied": "Odbijeno brisanje svih uređaja",
   "device.credentials_set": "Postavljen SSH ključ",
   "device.host_key_fetched": "Preuzet host ključ",
   "device.host_key_confirmed": "Potvrđen host ključ",

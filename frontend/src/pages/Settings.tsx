@@ -4,6 +4,7 @@ import { api } from "../api";
 import IntervalInput from "../components/IntervalInput";
 import AdvancedSettingsSection from "../components/AdvancedSettings";
 import BrandingCard from "../components/BrandingCard";
+import DeleteAllDevicesCard from "../components/DeleteAllDevicesCard";
 import NotificationSettingsSection from "../components/NotificationSettings";
 import { Alert, Button, Card, ErrorText, Field, Input, Select, Spinner } from "../components/ui";
 import { formatBytes, formatDateTime } from "../format";
@@ -101,6 +102,8 @@ export default function SettingsPage() {
       <NotificationSettingsSection />
 
       <AdvancedSettingsSection />
+
+      <DeleteAllDevicesCard />
 
       {system.data && (
         <Card title="Stanje aplikacije">

@@ -516,6 +516,23 @@ Na stranici uređaja su još **dostupnost** kroz vreme (periodi kada uređaj nij
 - **Promena IP adrese ili porta** (preko **Izmeni**) poništava potvrđeni otisak i isključuje nadzor. Ponovite korake 4 i 5.
 - **Brisanje uređaja** (**Obriši**) uklanja uređaj iz nadzora, ali istorija njegovih diskova ostaje. Na serveru zatim obrišite nalog `diskmonitor` (TrueNAS: *Credentials → Users*; Proxmox: `userdel -r diskmonitor` i `rm /etc/sudoers.d/smartdisk`).
 
+### Premeštanje u drugu mrežu: brisanje svih uređaja
+
+Kada se SmartDisk kontejner premesti ili vrati iz backup-a u drugu mrežu, stari uređaji tamo nisu dostupni. Umesto da ih brišete jedan po jedan:
+
+1. **Podešavanja → Brisanje svih uređaja → Obriši sve uređaje**.
+2. Prozor prikazuje koliko će uređaja biti obrisano i šta se dešava. Upišite **svoju lozinku** (lozinku naloga kojim ste prijavljeni) i potvrdite.
+3. Zatim dodajte uređaje iz nove mreže, od [koraka 1](#korak-1-dodajte-uređaj-u-aplikaciji).
+
+Šta se tačno dešava:
+
+- svi uređaji se uklanjaju iz nadzora i sa ekrana, a privatni SSH ključevi im se brišu iz aplikacije;
+- aktivni alarmi tih uređaja se zatvaraju;
+- **ostaju** istorija diskova, izveštaji i audit log. Radnja se beleži u audit logu, kao i svaki pokušaj sa pogrešnom lozinkom;
+- na samim serverima nalog `diskmonitor` i javni ključ ostaju. Uklonite ih ručno ako se server više neće nadzirati.
+
+Brisanje svih uređaja može samo **administrator**, i to samo prijavljen u aplikaciji, a ne preko API tokena. Pogrešna lozinka ništa ne briše.
+
 Tehnički detalji (tačni sudo profili, šta je provereno na kojoj verziji) su u dokumentu `docs/dodavanje-uredjaja.md`.
 
 ---
@@ -537,6 +554,7 @@ Tehnički detalji (tačni sudo profili, šta je provereno na kojoj verziji) su u
 | **Režim održavanja** | na nekoliko sati šalju se samo kritična obaveštenja (npr. tokom zamene diska) |
 | **Zakazani izveštaji** | automatsko slanje izveštaja e-poštom; **Pošalji sada** za proveru |
 | **Backup baze** | svakodnevni backup u izabrani sat, broj čuvanih kopija, **Napravi backup sada**. Backup ne sadrži glavni ključ aplikacije, koji administrator čuva odvojeno |
+| **Brisanje svih uređaja** | uklanja sve uređaje odjednom, uz potvrdu vašom lozinkom (videti [poglavlje 11](#premeštanje-u-drugu-mrežu-brisanje-svih-uređaja)) |
 | **Stanje aplikacije** | verzija, rad scheduler-a, veličina baze, slobodan prostor |
 
 **Audit log** (meni) beleži svaku važnu radnju: prijave, izmene uređaja, korisnika i podešavanja, potvrde alarma, backup.

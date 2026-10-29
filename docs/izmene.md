@@ -2,6 +2,11 @@
 
 Izmene posle Faze 5 i korisničkog uputstva (0.6.0). Svaka verzija na GitHub-u ima tag `vX.Y.Z`. Šta je isporučeno u fazama opisuju [izveštaji faza](../README.md#stanje-razvoja).
 
+## 0.6.9 - 29.10.2026.
+
+- **Brisanje svih uređaja** (Podešavanja → Brisanje svih uređaja), za premeštanje kontejnera u drugu mrežu. Potvrda lozinkom prijavljenog administratora; API tokenom nije dozvoljeno. Uređaji se brišu kao i pojedinačno (soft-delete, istorija diskova ostaje), uz brisanje njihovih privatnih ključeva i zatvaranje aktivnih alarma. U audit logu su `device.deleted_all` (broj i nazivi uređaja) i `device.delete_all_denied` (pogrešna lozinka).
+- Provereno na privremenoj kopiji baze: pogrešna lozinka vraća 403 i ništa ne briše, ispravna briše sva 4 uređaja i njihove ključeve, a 19 diskova ostaje u istoriji. Zatvaranje alarma nije provereno, jer u kopiji nije bilo aktivnih alarma.
+
 ## 0.6.8 - 29.10.2026.
 
 - **Detaljno uputstvo za povezivanje uređaja** (korisničko uputstvo, poglavlje 11, i stranica Pomoć): kako SmartDisk pristupa serveru, pet koraka od dodavanja uređaja do uključivanja nadzora, priprema naloga `diskmonitor` posebno za TrueNAS SCALE, TrueNAS CORE, Proxmox VE i Synology, potvrda host ključa, provera da sve radi, tabela grešaka pri povezivanju, promena ključa i uklanjanje uređaja.
