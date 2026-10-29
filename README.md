@@ -2,7 +2,7 @@
 
 Web aplikacija za centralizovani nadzor diskova, SMART podataka i zdravlja skladišta na TrueNAS, Proxmox VE i Synology sistemima. Radi u Debian 13 LXC kontejneru na Proxmoxu. Ceo interfejs je na srpskom (latinica).
 
-**Trenutna verzija: 0.6.7**
+**Trenutna verzija: 0.6.8**
 
 ![Pregled](docs/uputstvo-slike/01-pregled.jpg)
 
@@ -56,6 +56,7 @@ Aplikacija je zatim dostupna na `https://<IP-kontejnera>`. Detalji su u [docs/in
 
 - **[Korisničko uputstvo](docs/korisnicko-uputstvo.md)** - i u aplikaciji, stavka **Pomoć**
 - [Instalacija, nadogradnja, backup i održavanje](docs/instalacija.md)
+- [Povezivanje uređaja korak po korak](docs/korisnicko-uputstvo.md#11-uređaji-dodavanje-i-podešavanje) (ključevi, nalog `diskmonitor`, sve platforme)
 - [Dodavanje uređaja i SSH pristup](docs/dodavanje-uredjaja.md) (nalog `diskmonitor`, sudo profili po platformi)
 - [Obaveštenja: e-pošta, MQTT/Home Assistant, Web Push, Telegram, Pushover, webhook](docs/obavestenja.md)
 - [Arhitektura i tehničke odluke](docs/arhitektura.md)

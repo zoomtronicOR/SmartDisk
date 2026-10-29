@@ -2,6 +2,12 @@
 
 Izmene posle Faze 5 i korisničkog uputstva (0.6.0). Svaka verzija na GitHub-u ima tag `vX.Y.Z`. Šta je isporučeno u fazama opisuju [izveštaji faza](../README.md#stanje-razvoja).
 
+## 0.6.8 - 29.10.2026.
+
+- **Detaljno uputstvo za povezivanje uređaja** (korisničko uputstvo, poglavlje 11, i stranica Pomoć): kako SmartDisk pristupa serveru, pet koraka od dodavanja uređaja do uključivanja nadzora, priprema naloga `diskmonitor` posebno za TrueNAS SCALE, TrueNAS CORE, Proxmox VE i Synology, potvrda host ključa, provera da sve radi, tabela grešaka pri povezivanju, promena ključa i uklanjanje uređaja.
+- Za TrueNAS SCALE i CORE uputstvo sadrži celu `midclt user.create` komandu sa spiskom dozvoljenih komandi, pa se menjaju samo naziv pool-a i javni ključ.
+- Na stranici Pomoć svaki blok sa komandom ima dugme **Kopiraj**, a duge komande se prelamaju umesto da izlaze iz okvira.
+
 ## 0.6.7 - 29.10.2026.
 
 - **TrueNAS SCALE proveren na stvarnom uređaju** (27.0.0-RC.1): 6 diskova sa SMART podacima, pool-ovi `datapool` (RAIDZ1) i `boot-pool`, stanje scrub-a i resilver-a. Postupak za nalog `diskmonitor` preko `midclt` je u [dodavanje-uredjaja.md](dodavanje-uredjaja.md#truenas-scale).

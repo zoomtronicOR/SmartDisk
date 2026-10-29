@@ -276,20 +276,247 @@ Administrator može podesiti da izveštaji **stižu sami e-poštom** (Podešavan
 
 Meni **Uređaji** prikazuje sve nadzirane servere, sa stanjem, brojem diskova i upozorenja, intervalom i vremenom sledećeg očitavanja. **Prikupi sada** odmah osvežava podatke uređaja.
 
-Dodavanje uređaja radi administrator, a za pripremu servera potreban je pristup njemu (nalog `diskmonitor`). Tačni koraci za svaku platformu su u dokumentu *Dodavanje uređaja* (`docs/dodavanje-uredjaja.md`), a ukratko:
+Ovo poglavlje vodi korak po korak kroz povezivanje novog servera. Dodavanje uređaja radi **administrator** SmartDisk-a, a za pripremu servera potreban je administratorski pristup tom serveru (web interfejs ili konzola). Za jedan server je potrebno oko 15 minuta.
 
-1. Na serveru napraviti nalog `diskmonitor` sa ograničenim pravima (spisak komandi aplikacija prikazuje na stranici uređaja, kartica **Profil privilegija**).
-2. **Uređaji → Dodaj uređaj**: naziv, platforma, IP adresa, korisnik `diskmonitor`.
-3. Na stranici uređaja pratiti tri koraka:
-   1. **Generiši ključ** pa javni ključ dodati na server;
-   2. **Preuzmi otisak host ključa**, uporediti ga sa otiskom na samom serveru i tek tada potvrditi;
-   3. **Test konekcije**, pa **Uključi nadzor**.
+### Pre nego što počnete
+
+Pripremite:
+
+- **IP adresu servera** (npr. `192.168.88.47`) i SSH port (obično `22`);
+- **pristup serveru** kao administrator: konzola (*Shell* u web interfejsu TrueNAS-a ili Proxmox-a) ili SSH;
+- za TrueNAS: **naziv pool-a** na kome će biti home direktorijum naloga (videti korak 3).
+
+Na serveru mora da radi SSH servis:
+
+| Platforma | Gde se uključuje SSH |
+|---|---|
+| Proxmox VE | radi podrazumevano |
+| TrueNAS SCALE | *System → Services → SSH*: uključiti i štiklirati *Start Automatically* |
+| TrueNAS CORE | *Services → SSH*: uključiti i štiklirati *Start Automatically* |
+| Synology | *Control Panel → Terminal & SNMP → Enable SSH service* |
+
+### Kako SmartDisk pristupa serveru (ukratko)
+
+Ne morate ovo znati da biste pratili korake, ali pomaže da razumete zašto ih ima toliko:
+
+- **Poseban nalog `diskmonitor`.** SmartDisk se nikad ne prijavljuje kao `root` ili administrator, nego namenskim nalogom koji sme samo da čita.
+- **SSH ključ umesto lozinke.** SmartDisk napravi par ključeva. **Privatni ključ** ostaje šifrovan u aplikaciji i nikad se ne prikazuje. **Javni ključ** (red teksta koji počinje sa `ssh-ed25519`) upisujete na server. To je kao brava za koju samo SmartDisk ima ključ.
+- **Ograničen sudo.** Neke komande (čitanje SMART podataka) traže administratorska prava. Nalog `diskmonitor` sme bez lozinke da pokrene **samo tačno navedene komande za čitanje**, ništa drugo. Ne može da menja diskove, pokrene test ili scrub.
+- **Host ključ (otisak servera).** Svaki server ima svoj „otisak” (`SHA256:…`). Pri prvom povezivanju ga potvrđujete ručno, da bi SmartDisk bio siguran da razgovara sa pravim serverom. Ako se otisak kasnije promeni, SmartDisk odbija vezu dok je ponovo ne potvrdite.
+
+### Korak 1: dodajte uređaj u aplikaciji
+
+1. Meni **Uređaji → Dodaj uređaj**.
+2. Popunite:
+   - **Naziv**: kako želite da se server zove u aplikaciji (npr. „TrueNAS SCALE”);
+   - **Platforma**: Proxmox VE, TrueNAS SCALE, TrueNAS CORE ili Synology;
+   - **IP adresa ili DNS ime** i **SSH port** (obično 22);
+   - **SSH korisnik**: `diskmonitor` (ne `root`);
+   - **Interval prikupljanja**: ostavite *Koristi globalni interval*, osim ako ovaj server treba češće ili ređe proveravati.
+3. Sačuvajte. Otvara se stranica uređaja. Uređaj je za sada **isključen** i ne prikuplja ništa.
+
+### Korak 2: napravite SSH ključ
+
+Na stranici uređaja, u kartici **Podešavanje pristupa**:
+
+1. Kliknite **Generiši ključ** (korak 1 u kartici).
+2. Pojavi se **javni ključ**, jedan dug red, na primer:
+   ```text
+   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA…GMNk smartdisk-4
+   ```
+   Broj na kraju (`smartdisk-4`) je broj uređaja u aplikaciji, da znate kom uređaju ključ pripada.
+3. Kliknite **Kopiraj**. Ključ ćete upisati na server u koraku 3.
+
+**Preporuka za bezbednost:** ispred ključa dodajte ograničenja, tako da ključ radi **samo sa adrese SmartDisk-a** i ne može da otvori terminal. Ceo red tada izgleda ovako (sve u jednom redu, `192.168.88.246` je adresa SmartDisk-a):
+
+```text
+from="192.168.88.246",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA… smartdisk-4
+```
+
+> Javni ključ **nije tajna** i može se slobodno kopirati. Privatni ključ SmartDisk nikad ne prikazuje.
+>
+> Javni ključ **nije komanda**. Ako ga nalepite direktno u terminal, dobićete grešku „command not found”. Ključ se upisuje u polje naloga ili u fajl, kako je opisano u koraku 3.
+
+Ako već imate svoj par ključeva, umesto *Generiši ključ* izaberite **Unesi postojeći privatni ključ**. Tada javni ključ na server upisujete sami.
+
+### Korak 3: pripremite server
+
+U ovom koraku na serveru pravite nalog `diskmonitor`, upisujete mu javni ključ i dozvoljavate samo komande za čitanje. Postupak zavisi od platforme. Tačan spisak dozvoljenih komandi uvek se vidi u aplikaciji: stranica uređaja → kartica **Profil privilegija za nalog na uređaju** → *Prikaži tačne komande*, sa dugmetom **Kopiraj**.
+
+#### TrueNAS SCALE
+
+TrueNAS sam upravlja nalozima i sudo pravima i briše ručne izmene fajlova. Zato se nalog pravi kroz web interfejs ili komandom `midclt`, nikad ručnom izmenom fajlova.
+
+**Način A: jednom komandom (provereno na SCALE 27)**
+
+1. U web interfejsu otvorite *System → Shell*, ili se prijavite preko SSH-a kao administrator (`admin` ili `truenas_admin`).
+2. Saznajte naziv pool-a:
+   ```bash
+   zpool list -Ho name
+   ```
+   Uzmite pool koji **nije** `boot-pool` (npr. `datapool`).
+3. Nalepite komandu ispod, pa u njoj **pre pokretanja** zamenite dve stvari:
+   - `TVOJ_POOL` nazivom pool-a iz prethodnog koraka;
+   - `ssh-ed25519 AAAA… smartdisk-N` celim javnim ključem iz aplikacije.
+
+   ```bash
+   sudo midclt call user.create '{"username":"diskmonitor","full_name":"SmartDisk nadzor (read-only)","group_create":true,"password_disabled":true,"smb":false,"ssh_password_enabled":false,"home":"/mnt/TVOJ_POOL","home_create":true,"shell":"/usr/bin/bash","sudo_commands_nopasswd":["/usr/sbin/smartctl -j --scan-open","/usr/sbin/smartctl -j -a -n standby -d sat /dev/sd[a-z]","/usr/sbin/smartctl -j -a -n standby -d sat /dev/sd[a-z][a-z]","/usr/sbin/smartctl -j -a -n standby -d scsi /dev/sd[a-z]","/usr/sbin/smartctl -j -a -n standby -d scsi /dev/sd[a-z][a-z]","/usr/sbin/smartctl -j -a -n standby -d ata /dev/sd[a-z]","/usr/sbin/smartctl -j -a -n standby -d ata /dev/sd[a-z][a-z]","/usr/sbin/smartctl -j -a -n standby -d auto /dev/sd[a-z]","/usr/sbin/smartctl -j -a -n standby -d auto /dev/sd[a-z][a-z]","/usr/sbin/smartctl -j -a -n standby -d nvme /dev/nvme[0-9]","/usr/sbin/smartctl -j -a -n standby -d nvme /dev/nvme[0-9][0-9]"],"sshpubkey":"from=\"192.168.88.246\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA… smartdisk-N"}'
+   ```
+4. `sudo` traži lozinku administratora. Ako je sve u redu, ispisuje se zapis novog naloga, koji počinje sa `{"id": …`. U njemu proverite da je `"home": "/mnt/<pool>/diskmonitor"` i `"smb": false`.
+
+**Način B: kroz web interfejs**
+
+*Credentials → Users → Add*. Nazivi polja se malo razlikuju između verzija:
+
+| Polje | Vrednost |
+|---|---|
+| Username | `diskmonitor` |
+| Full Name | `SmartDisk nadzor (read-only)` |
+| Disable Password | uključeno |
+| SMB User | **isključeno** (nalog bez lozinke ne može biti SMB korisnik) |
+| Home Directory | pool, npr. `/mnt/datapool`, uz uključeno *Create Home Directory* |
+| Shell | `bash` |
+| Authorized Keys / SSH Public Key | ceo javni ključ iz aplikacije, u jednom redu |
+| Allowed sudo commands with no password | komande iz aplikacije, **jedna po redu** (kartica *Profil privilegija* → *Komande za TrueNAS polje*) |
+| Allow all sudo commands | **isključeno** |
+
+**Česte greške na SCALE-u:**
+
+- **Ključ ne može da se sačuva:** nalog nema home direktorijum na pool-u (podrazumevano je `/var/empty`). Postavite *Home Directory* na pool i uključite *Create Home Directory*.
+- **„SMB” greška pri čuvanju:** isključite *SMB User*.
+- **`midclt` vraća `[]` pri proveri:** nalog još ne postoji. Proveru radi komanda `sudo midclt call user.query '[["username","=","diskmonitor"]]'`.
+
+#### TrueNAS CORE
+
+Kao i SCALE, CORE sam upravlja nalozima, pa se nalog pravi kroz web interfejs ili `midclt`. Komande se pokreću kao `root` u *Shell*-u web interfejsa.
+
+**Način A: komandama (provereno na CORE 13)**
+
+1. Naziv pool-a: `zpool list -Ho name` (ne `boot-pool` ni `freenas-boot`).
+2. Slobodan broj korisnika:
+   ```bash
+   midclt call user.get_next_uid
+   ```
+   Dobićete broj, npr. `1002`.
+3. Nalepite komandu ispod i zamenite:
+   - `BROJ` brojem iz prethodnog koraka;
+   - `TVOJ_POOL` nazivom pool-a;
+   - `ssh-ed25519 AAAA… smartdisk-N` javnim ključem iz aplikacije.
+
+   ```bash
+   midclt call user.create '{"username":"diskmonitor","uid":BROJ,"full_name":"SmartDisk nadzor (read-only)","group_create":true,"password_disabled":true,"home":"/mnt/TVOJ_POOL/diskmonitor","shell":"/bin/sh","sudo":true,"sudo_nopasswd":true,"sudo_commands":["/usr/local/sbin/smartctl -j --scan-open","/usr/local/sbin/smartctl -j -a -n standby -d atacam /dev/ada[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d atacam /dev/ada[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d ata /dev/ada[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d ata /dev/ada[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d sat /dev/ada[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d sat /dev/ada[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d auto /dev/ada[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d auto /dev/ada[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d scsi /dev/da[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d scsi /dev/da[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d sat /dev/da[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d sat /dev/da[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d auto /dev/da[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d auto /dev/da[0-9][0-9]","/usr/local/sbin/smartctl -j -a -n standby -d nvme /dev/nvme[0-9]","/usr/local/sbin/smartctl -j -a -n standby -d nvme /dev/nvme[0-9][0-9]"],"sshpubkey":"from=\"192.168.88.246\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA… smartdisk-N"}'
+   ```
+4. Komanda vraća broj (id naloga), što znači da je uspela.
+
+**Način B: kroz web interfejs** (*Accounts → Users → Add*): korisničko ime `diskmonitor`, *Disable Password*, shell `sh`, home direktorijum na pool-u, javni ključ u *SSH Public Key*, **Permit Sudo** uključeno, a u spisak sudo komandi uneti komande iz aplikacije.
+
+**Česte greške na CORE-u:**
+
+- `KeyError: 'uid'`: komandi nedostaje `"uid"`. Uzmite broj iz `user.get_next_uid`.
+- „direktorijum već postoji”: home direktorijum se ne pravi unapred. TrueNAS ga pravi sam.
+- **Spisak sudo komandi nikad ne ostavljajte prazan:** prazan spisak u TrueNAS-u znači „sve komande”.
+
+#### Proxmox VE
+
+Na Proxmox-u se nalog pravi običnim Linux komandama. Prijavite se kao `root` (*Node → Shell* u web interfejsu ili SSH). Ako imate cluster, postupak se ponavlja na **svakom čvoru**, a svaki čvor je poseban uređaj u SmartDisk-u.
+
+1. Instalirajte `sudo` (na Proxmox-u ga nema podrazumevano) i napravite nalog bez lozinke:
+   ```bash
+   apt install sudo
+   useradd -m -s /bin/bash -c "SmartDisk nadzor (read-only)" diskmonitor
+   passwd -l diskmonitor
+   install -d -m 700 -o diskmonitor -g diskmonitor /home/diskmonitor/.ssh
+   ```
+2. Upišite javni ključ. U komandi zamenite `ssh-ed25519 AAAA… smartdisk-N` ključem iz aplikacije, a jednostruki navodnici na početku i kraju ostaju:
+   ```bash
+   echo 'from="192.168.88.246",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA… smartdisk-N' > /home/diskmonitor/.ssh/authorized_keys
+   chown diskmonitor:diskmonitor /home/diskmonitor/.ssh/authorized_keys
+   chmod 600 /home/diskmonitor/.ssh/authorized_keys
+   ```
+3. Dozvolite komande za čitanje. U aplikaciji, u kartici **Profil privilegija** → *sudoers profil*, kliknite **Kopiraj**. Zatim na serveru:
+   ```bash
+   nano /tmp/smartdisk.sudoers
+   ```
+   Nalepite profil, sačuvajte (`Ctrl+O`, `Enter`) i izađite (`Ctrl+X`). Proverite ga i instalirajte:
+   ```bash
+   visudo -cf /tmp/smartdisk.sudoers && install -m 0440 -o root -g root /tmp/smartdisk.sudoers /etc/sudoers.d/smartdisk
+   ```
+   Ispravan profil ispisuje `parsed OK`. Ako piše greška, fajl se **ne instalira**: ponovo ga kopirajte iz aplikacije.
+
+#### Synology DSM
+
+> Synology još nije proveren na stvarnom uređaju. Koraci su po dokumentaciji DSM-a i mogu zahtevati prilagođavanje. Ako nešto ne radi, pošaljite tekst greške administratoru aplikacije.
+
+1. *Control Panel → User & Group → Create*: korisnik `diskmonitor`, jaka nasumična lozinka (neće se koristiti), bez dozvola za deljene foldere.
+2. *Control Panel → User & Group → Advanced → Enable user home service* (potrebno da bi nalog imao home direktorijum).
+3. Prijavite se preko SSH-a kao administrator, pa pređite u root sa `sudo -i`.
+4. Upišite ključ:
+   ```bash
+   mkdir -p /var/services/homes/diskmonitor/.ssh
+   echo 'from="192.168.88.246",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA… smartdisk-N' > /var/services/homes/diskmonitor/.ssh/authorized_keys
+   chown -R diskmonitor:users /var/services/homes/diskmonitor/.ssh
+   chmod 700 /var/services/homes/diskmonitor/.ssh
+   chmod 600 /var/services/homes/diskmonitor/.ssh/authorized_keys
+   ```
+5. Sudo profil iz aplikacije sačuvajte kao `/etc/sudoers.d/smartdisk` (isto kao kod Proxmox-a, korak 3).
+
+DSM podrazumevano dozvoljava SSH prijavu samo administratorima, a **nadogradnja DSM-a može da ukloni sudo profil**. Posle svake nadogradnje proverite da prikupljanje i dalje radi.
+
+### Korak 4: potvrdite otisak servera (host ključ)
+
+1. U aplikaciji, korak 2 u kartici **Podešavanje pristupa**: kliknite **Preuzmi otisak host ključa**.
+2. Aplikacija prikaže otisak, na primer `SHA256:WFrPwzkHj4k0K8PV8Jv0GtjDeCd71ezH0GWO1ebWF7U`, i komandu kojom ga proveravate.
+3. **Na samom serveru** pokrenite tu komandu:
+
+   | Platforma | Komanda |
+   |---|---|
+   | Proxmox VE, TrueNAS SCALE, Synology | `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` |
+   | TrueNAS CORE | `ssh-keygen -lf /usr/local/etc/ssh/ssh_host_ed25519_key.pub` |
+
+4. Uporedite deo koji počinje sa `SHA256:`. **Samo ako je potpuno isti** kliknite **Otisak se poklapa - potvrđujem**.
+
+Ako se otisci ne poklapaju, **ne potvrđujte**. Proverite da li je u aplikaciji upisana tačna IP adresa i da li je to zaista taj server.
+
+### Korak 5: test konekcije i uključivanje nadzora
+
+1. Kliknite **Test konekcije** (gore desno). Poruka „Konekcija uspešna” znači da se SmartDisk prijavio i prepoznao sistem.
+2. U kartici **Dostupni alati na uređaju** proverite da je `smartctl` **Dostupan**. Za TrueNAS i Proxmox sa ZFS-om i `zpool` treba da bude dostupan.
+3. Korak 3 u kartici **Podešavanje pristupa**: kliknite **Uključi nadzor**.
+4. Po želji kliknite **Prikupi sada** da ne čekate prvi zakazani ciklus.
+
+### Kako znate da sve radi
+
+Posle prvog prikupljanja, na stranici uređaja:
+
+- **Stanje → Poslednja greška** je „-”, a **Poslednji uspešan kontakt** je pre nekoliko minuta;
+- u **Istoriji prikupljanja** poslednji red ima status **Uspešno**. **Delimično** znači da veza radi, ali neka komanda nije dozvoljena (vidite poglavlje ispod);
+- u tabeli **Diskovi** su svi diskovi servera, sa SMART statusom (npr. PASSED) i temperaturom;
+- u **Skladištu** su pool-ovi ili RAID nizovi servera.
 
 ![Stranica uređaja](uputstvo-slike/04-uredjaj.jpg)
 
-Na stranici uređaja su još: stanje i poslednja greška, dostupni alati, diskovi i skladište tog uređaja, **dostupnost** kroz vreme (sa periodima kada uređaj nije odgovarao) i istorija prikupljanja. Status prikupljanja **Delimično** znači da je veza uspela, ali deo podataka nije pročitan (najčešće nedostaje dozvola za neku komandu; razlog piše u istoriji).
+Na stranici uređaja su još **dostupnost** kroz vreme (periodi kada uređaj nije odgovarao) i istorija prikupljanja.
 
-Brisanje uređaja ne briše istoriju njegovih diskova.
+### Kada se nešto ne poveže
+
+| Šta piše u aplikaciji | Šta to znači i šta da uradite |
+|---|---|
+| „Konekcija je odbijena” | SSH servis na serveru ne radi ili je na drugom portu. Uključite SSH (tabela na početku poglavlja) ili ispravite port. |
+| „Isteklo je vreme za povezivanje” | Server nije dostupan sa SmartDisk-a: ugašen je, pogrešna je IP adresa ili blokira firewall. |
+| „SSH prijava je odbijena” | Javni ključ nije upisan na server, ključ je prelomljen u više redova, adresa u `from="…"` nije adresa SmartDisk-a ili je pogrešno korisničko ime. Na Proxmox-u proverite i prava: `.ssh` mora biti 700, a `authorized_keys` 600. |
+| „Host ključ se ne poklapa” | Server je reinstaliran ili zamenjen, ili je IP adresa sada dodeljena drugom računaru. Proverite server, pa ponovo **Preuzmi i proveri ključ** i potvrdite. |
+| Prikupljanje je **Delimično**, poruka o sudo-u | Nalogu nedostaje dozvola za neku komandu. Uporedite sudo komande na serveru sa karticom **Profil privilegija** u aplikaciji. |
+| „smartctl nije pronađen” | Alat nije instaliran ili ga nalog ne vidi. Pogledajte karticu **Dostupni alati na uređaju**. |
+| Prepoznat je drugi sistem | U podacima uređaja je izabrana pogrešna **Platforma**. Ispravite je preko **Izmeni**. |
+| Disk ima „SMART nedostupan” | Kontroler ili USB kućište ne prosleđuje SMART podatke. Disk ostaje u inventaru, ali mu se zdravlje ne može proceniti. |
+
+### Promena ključa, adrese i uklanjanje uređaja
+
+- **Novi ključ:** **Generiši novi ključ** pravi novi par i zamenjuje stari. Novi javni ključ upišite na server, a **stari obrišite sa servera**: u TrueNAS-u u polju ključa naloga, na Proxmox-u u fajlu `/home/diskmonitor/.ssh/authorized_keys`.
+- **Promena IP adrese ili porta** (preko **Izmeni**) poništava potvrđeni otisak i isključuje nadzor. Ponovite korake 4 i 5.
+- **Brisanje uređaja** (**Obriši**) uklanja uređaj iz nadzora, ali istorija njegovih diskova ostaje. Na serveru zatim obrišite nalog `diskmonitor` (TrueNAS: *Credentials → Users*; Proxmox: `userdel -r diskmonitor` i `rm /etc/sudoers.d/smartdisk`).
+
+Tehnički detalji (tačni sudo profili, šta je provereno na kojoj verziji) su u dokumentu `docs/dodavanje-uredjaja.md`.
 
 ---
 
@@ -354,7 +581,7 @@ Token nikad nema administratorska prava. Opis API-ja je na adresi `/api/docs`.
 | Pregledač ili antivirus (npr. Kaspersky) upozorava na nepouzdan sertifikat ili blokira stranicu | Na računar treba instalirati sertifikat aplikacije (*SmartDisk-CA.crt*): dvoklik → *Install Certificate* → *Local Machine* → *Trusted Root Certification Authorities*, pa ponovo pokrenuti pregledač. Postupak je u `docs/instalacija.md`. |
 | „Sesija je istekla. Prijavite se ponovo.” | Prošlo je 30 minuta bez aktivnosti. Prijavite se ponovo. |
 | Nalog je zaključan | Posle 5 pogrešnih lozinki: sačekajte 15 minuta ili zamolite administratora da ga otključa. |
-| Uređaj ima status **Greška** ili alarm „uređaj nije dostupan” | Server je ugašen, mreža ne radi ili je promenjen SSH. Poruka greške na stranici uređaja govori šta tačno: „Konekcija je odbijena” (SSH ne radi), „Isteklo je vreme” (mreža), „Host ključ se ne poklapa” (server je reinstaliran: ključ treba ponovo proveriti i potvrditi). |
+| Uređaj ima status **Greška** ili alarm „uređaj nije dostupan” | Server je ugašen, mreža ne radi ili je promenjen SSH. Poruka greške na stranici uređaja govori šta tačno: „Konekcija je odbijena” (SSH ne radi), „Isteklo je vreme” (mreža), „Host ključ se ne poklapa” (server je reinstaliran: ključ treba ponovo proveriti i potvrditi). Sve poruke i rešenja su u [poglavlju 11](#kada-se-nešto-ne-poveže). |
 | Prikupljanje je **Delimično** | Veza radi, ali neka komanda nije dozvoljena (najčešće sudo). Administrator proverava profil privilegija na stranici uređaja. |
 | Disk ima **Nepoznato** / „SMART nedostupan” | Kontroler ili USB kućište ne prosleđuje SMART podatke. Disk se i dalje vidi u inventaru, ali mu se zdravlje ne može proceniti. |
 | Disk stalno prikazuje **Standby** | Disk spava i SmartDisk ga namerno ne budi. Vrednosti su iz poslednjeg očitavanja dok je bio budan. |

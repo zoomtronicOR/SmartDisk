@@ -2,6 +2,8 @@
 
 Aplikacija se na uređaj prijavljuje **namenskim nalogom samo za nadzor** (`diskmonitor`), isključivo SSH ključem. Nalog sme da izvrši samo tačno određene read-only komande (spec. §5.3). Profili u ovom dokumentu su provereni na Proxmox VE 9.2, TrueNAS CORE 13.0 i TrueNAS SCALE 27.0. Synology DSM još nije proveren na stvarnom uređaju (videti [izveštaj o Fazi 2](faza-2-izvestaj.md)).
 
+Uputstvo korak po korak za korisnike, sa komandama spremnim za kopiranje, je u [korisničkom uputstvu, poglavlje 11](korisnicko-uputstvo.md#11-uređaji-dodavanje-i-podešavanje). Ovaj dokument je tehnička referenca.
+
 Tačan spisak komandi i gotov sudoers fajl za svaku platformu prikazuje i sama aplikacija: stranica uređaja → **Profil privilegija za nalog na uređaju** (dugme *Kopiraj*). Spisak se pravi iz istih šablona po kojima aplikacija izvršava komande.
 
 ## Redosled koraka
